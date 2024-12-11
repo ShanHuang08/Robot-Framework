@@ -1,5 +1,5 @@
 from random import randint, choice, randrange
-from Ronot_definition import log_color
+from Robot_definition import log_color
 import time
 
 class BaseFunction():
