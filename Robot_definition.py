@@ -1,5 +1,6 @@
 from robot.libraries.BuiltIn import BuiltIn
 from robot.api.deco import keyword
+from robot.api import logger
 
 def run(name, *args):
     BuiltIn().run_keyword(name, *args)
@@ -66,6 +67,46 @@ def click_element(element):
     except Exception as e:
         BuiltIn().run_keyword("Capture Page Screenshot")
         raise e
+
+def _print_method_info(method, uri, exp_code=None, header=None, data=None):
+    if exp_code is not None and header is None and data is None:
+        logger.info(f"making {method} request on {uri} and expecting status code {exp_code}...")
+    elif exp_code is not None and header is not None and data is None:
+        logger.info(f"making {method} request on {uri} with header {header} and expecting status code {exp_code}...")
+    elif exp_code is not None and header is None and data is not None:
+        logger.info(f"making {method} request on {uri} with body {data} and expecting status code {exp_code}...")
+    elif exp_code is not None and header is not None and data is not None:
+        logger.info(f"making {method} request on {uri} with header {header} and body {data} and expecting status code {exp_code}...")
+    elif exp_code is None and header is None and data is None:
+        logger.info(f"making {method} request on {uri}...")
+    elif exp_code is None and header is not None and data is None:
+        logger.info(f"making {method} request on {uri} with header {header}...")
+    elif exp_code is None and header is None and data is not None:
+        logger.info(f"making {method} request on {uri} with body {data}...")
+    elif exp_code is None and header is not None and data is not None:
+        logger.info(f"making {method} request on {uri} with header {header} and body {data}...")
+
+
+def make_get_request(uri, ip, user="", pw="", exp_code=None):
+    """ This method will make a GET request of the given URI """
+    import requests
+    _print_method_info("GET", uri, exp_code)
+    if len(uri.split('.')) != 4 or "MRVL" in uri or "Base" in uri or "HBA" in uri or "HA-RAID" in uri:
+        uri = "https://" + ip + uri
+    if not user and not pw:
+        # Set user/pw if user/pw is not given
+        user = 'self.username'
+        pw = 'self.password'
+    logger.debug(f"using username {user} / password {pw}")
+    try:
+        resp = requests.get(uri, auth=(user,pw), verify=False, timeout=60)
+    except ConnectionError:
+        raise Exception('Connection lost on request.')
+    if exp_code and (resp.status_code != int(exp_code)):
+        raise Exception(
+            "GET request with {}/{} - status code should be {} but it is {}\nResponse body: {}".format(
+                user, pw, exp_code, resp.status_code, resp.text))
+    return resp
 
 def use_globals_update_keywords(put_class, local_globals):
     """ 
