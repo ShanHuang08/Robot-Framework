@@ -29,12 +29,63 @@ class My_methods(BaseFunction):
             log(f'Answer {red_text} is <b>NOT</b> even and <b style="color: red;">{Summ}</b> > 100', level='ERROR', html=True)
             fail(f'Answer {Summ} is NOT even and {Summ} > 100')
         else: log(Summ)
+    
+    def type_error_with_try_except(self):
+        try:
+            err_add_type = '1' + 2
+            log(err_add_type)
+        except Exception as e:
+            log(f"str(1) + int(2) triggers <b>{e}</b> Exception")
+    
+    def type_error_test(self):
+        err_add_type = '1' + 2
+        log(err_add_type)
+
+    def loop_error(self):
+        List = ['1', 2]
+        log(List[2])
+
+    def loop_error_with_try_except(self):
+        try:
+            List = ['1', 2]
+            log(List[2])
+        except Exception as e:
+            log(f"List[2] on ['1', 2] triggers <b>{e}</b> Exception")
+
+    def genator_error(self):
+        test_tuple = (num for num in range(5))
+        for i in test_tuple:
+            if i%2 == 0: log(i)
+        next(test_tuple)
+
+    def genator_error_with_try_except(self):
+        try:
+            test_tuple = (num for num in range(5))
+            for i in test_tuple:
+                if i%2 == 0: log(i)
+            next(test_tuple)
+        except StopIteration as e:
+            log(f"Generator exhausted, <b>next(test_tuple)</b> iterate empty!")
 
     def test_run(self):
+        log('Run Robot keywords in Python')
         run('for_loop_print_keyowrds', 10)
-        run('print fruit')
         run('log_color', 'Google', self.Ramdom_color())
         log_hyperlink('Google link', 'http://www.google.com', print=True)
+
+    def test_errors(self):
+        try:
+            run('type_error_test')
+        except:
+            run('type_error_with_try_except')
+        try:
+            run('loop_error')
+        except:
+            run('loop_error_with_try_except')
+        try:
+            run('genator_error')
+        except:
+            run('genator_error_with_try_except')
 
     def test_even_max(self):
         run('skip_on_even_max', randint(1, 20), randint(1, 20))
