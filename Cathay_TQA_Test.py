@@ -89,8 +89,8 @@ def Get_cards_screenshot(driver, card_links):
 
 def main():
     options = Options()
-    # options.add_argument("--headless")  # 無頭模式，不開啟瀏覽器視窗
-    # options.add_argument("--disable-gpu")  # 禁用 GPU
+    options.add_argument("--headless")  
+    options.add_argument("--disable-gpu")  
 
     mobile_emulation = {"deviceName": "iPhone X"}
     options.add_experimental_option("mobileEmulation", mobile_emulation)
