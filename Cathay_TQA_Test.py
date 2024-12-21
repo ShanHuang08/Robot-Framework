@@ -24,20 +24,20 @@ class Cathay(SeleniumBase):
         self.Click_Element(By.XPATH, Cathay_Xpath['Menu'])
         self.Click_Element(By.XPATH, Cathay_Xpath['產品介紹'])
         self.Click_Element(By.XPATH, Cathay_Xpath['信用卡'])
-        self.Save_Screenshot(By.XPATH, Cathay_Xpath['掛失信用卡'], filename='credit card list.png')
+        self.Save_Screenshot(By.XPATH, Cathay_Xpath['掛失信用卡'], filename='credit card service list.png')
         # card_services = driver.find_elements(By.XPATH, value='//div[@class="cubre-a-menuSortBtn" and contains(@class, "cubre-u-mbOnly")]/a') #It's not working
         card_services = self.find_xpaths(value=Cathay_Xpath['Card Service list'])
         if card_services:
-            print(f"{len(card_services)} items are in the card services")
+            log(f"{len(card_services)} items are in the card services")
             for service in card_services:
-                print(service.text)
+                log(service.text)
 
         # 3. 個人金融 > 產品介紹 > 信用卡 > 卡片介紹 > 計算頁面上所有(停發)信用卡數量並截圖
         self.Click_Element(By.XPATH, Cathay_Xpath['卡片介紹'])
 
         # card_list = driver.find_elements(By.XPATH, value='//div[@class="cubre-m-compareCard -credit"]/div[@class="cubre-m-compareCard__title"]')
         card_list = self.find_xpaths(value=Cathay_Xpath['已停發'])
-        if card_list: print(f'所有停發信用卡有{len(card_list)}張')
+        if card_list: log(f'所有停發信用卡有{len(card_list)}張')
 
         # card_pics = driver.find_elements(By.XPATH, value='//div[@class="cubre-m-compareCard__pic"]/img')
         card_pics = self.find_xpaths(value=Cathay_Xpath['已停發圖片連結'])
@@ -59,6 +59,8 @@ class Cathay(SeleniumBase):
             sleep(2)
             self.Save_Screenshot(By.XPATH, '/html', ob_filename)
             num+=1
+
+use_globals_update_keywords(Cathay(), globals())
 
 # TQA測試: 程式邏輯題目
 import random
@@ -106,7 +108,7 @@ def question3(n:int):
         print(f"The last order is {num}")
     else: print('n range should be between 0 to 100')
 
-use_globals_update_keywords(Cathay(), globals())
+
 
 if __name__=='__main__':
     # 程式邏輯題目

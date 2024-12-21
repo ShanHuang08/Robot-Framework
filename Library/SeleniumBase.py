@@ -26,7 +26,7 @@ class SeleniumBase():
         return self.driver
 
     def Firefox_Web(self, path):
-        self.driver = webdriver.Firefox(service=Service(path+'geckodriver.exe'))
+        self.driver = webdriver.Firefox(service=Service(path))
         log(f'Launch Firefox_Web driver')
         return self.driver
 
@@ -60,31 +60,31 @@ class SeleniumBase():
         return self.driver.window_handles
     
     def Click_Element(self, method, value):
-
         from selenium.common.exceptions import ElementNotInteractableException
         from time import time
+        
         try:
             element = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((method, value)))
             log(f"Click {value}")
             element.click()
         except ElementNotInteractableException as e:
-            print(f"Element is not interactable: {e}")
+            log(f"Element is not interactable: {e}")
             screenshot_name = f"Fail_screenshot_{int(time())}.png"
             self.driver.save_screenshot(screenshot_name)
-            print(f"Screen has been save as: {screenshot_name}")
+            log(f"Screen has been save as: {screenshot_name}")
 
     def Save_Screenshot(self, method, value, filename, wait_secs=20):
 
         try:
             WebDriverWait(self.driver, wait_secs).until(
-                EC.element_to_be_clickable((method, value)))
+                EC.visibility_of_element_located((method, value)))
             is_element_displayed = self.driver.find_element(method, value).is_displayed()
             if is_element_displayed:
                 log(f"Save screenshot as {filename}")
                 self.driver.save_screenshot(filename)
-            else: print(f"Element {value} does not display.")
+            else: log(f"Element {value} does not display.")
         except:
-            print(f"Element {value} is unable show up in {wait_secs} seconds")
+            log(f"Element {value} is unable show up in {wait_secs} seconds")
             log(f"Save screenshot as Error_{filename}")
             self.driver.save_screenshot(f"Error_{filename}")
