@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Robot_definition import log
+from time import sleep
 
 
 class SeleniumBase():
@@ -88,3 +89,12 @@ class SeleniumBase():
             log(f"Element {value} is unable show up in {wait_secs} seconds")
             log(f"Save screenshot as Error_{filename}")
             self.driver.save_screenshot(f"Error_{filename}")
+    
+    def Get_Card_Screenshots(self, card_links):
+        num = 1
+        for link in card_links:
+            ob_filename = f'Obsolete_card_{num}.png'
+            self.driver.get(link)
+            sleep(2)
+            self.Save_Screenshot(By.XPATH, '/html', ob_filename)
+            num+=1
