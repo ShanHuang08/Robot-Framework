@@ -1,44 +1,46 @@
 # TQA測試: Selenium
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from time import sleep
 from Library.SeleniumBase import SeleniumBase
+from Library.Robot_definition import log, use_globals_update_keywords
+from Library.WebElements import Cathay_Xpath
+
 
 class Cathay(SeleniumBase):
 
     def Scrap_Cathay(self):
         self.chromedriver_path = 'C:\\Users\\Shan\\Workspace2\\chromedriver.exe'
+        url = "https://www.cathaybk.com.tw/cathaybk/"
         # options.add_argument("--headless")  
         # options.add_argument("--disable-gpu")  
         self.driver = self.Chrome_WAP(self.chromedriver_path)
 
         # 1. 使用Chrome App到國泰世華銀行官網(https://www.cathaybk.com.tw/cathaybk/)並將畫面截圖。
-        self.driver.get("https://www.cathaybk.com.tw/cathaybk/")
+        log(f'Access to {url}')
+        self.driver.get(url)
         self.Save_Screenshot(By.XPATH, '/html', filename='main page.png')
 
         # 2. 點選左上角選單，進入 個人金融 > 產品介紹 > 信用卡列表，需計算有幾個項目在信用卡選單下面，並將畫面截圖。
-        self.Click_Element(By.XPATH, value='//a[@class="cubre-a-burger"]')
-        self.Click_Element(By.XPATH, value='//div[@class="cubre-o-nav__content"]//*[contains(text(),"產品介紹")]')
-        self.Click_Element(By.XPATH, value='//div[@class="cubre-o-menuLinkList__btn"]//*[contains(text(),"信用卡")]')
-        self.Save_Screenshot(By.XPATH, '//*[contains(text(),"掛失信用卡")]', filename='credit card list.png')
+        self.Click_Element(By.XPATH, Cathay_Xpath['Menu'])
+        self.Click_Element(By.XPATH, Cathay_Xpath['產品介紹'])
+        self.Click_Element(By.XPATH, Cathay_Xpath['信用卡'])
+        self.Save_Screenshot(By.XPATH, Cathay_Xpath['掛失信用卡'], filename='credit card list.png')
         # card_services = driver.find_elements(By.XPATH, value='//div[@class="cubre-a-menuSortBtn" and contains(@class, "cubre-u-mbOnly")]/a') #It's not working
-        card_services = self.find_xpaths(value='/html/body/div[1]/header/div/div[3]/div/div[2]/div[1]/div/div[1]/div[2]/div/div[1]/div[2]/a')
+        card_services = self.find_xpaths(value=Cathay_Xpath['Card Service list'])
         if card_services:
             print(f"{len(card_services)} items are in the card services")
             for service in card_services:
                 print(service.text)
 
         # 3. 個人金融 > 產品介紹 > 信用卡 > 卡片介紹 > 計算頁面上所有(停發)信用卡數量並截圖
-        self.Click_Element(By.XPATH, '//a[contains(text(),"卡片介紹")]')
+        self.Click_Element(By.XPATH, Cathay_Xpath['卡片介紹'])
 
         # card_list = driver.find_elements(By.XPATH, value='//div[@class="cubre-m-compareCard -credit"]/div[@class="cubre-m-compareCard__title"]')
-        card_list = self.find_xpaths(value='//*[contains(text(), "已停發")]')
+        card_list = self.find_xpaths(value=Cathay_Xpath['已停發'])
         if card_list: print(f'所有停發信用卡有{len(card_list)}張')
 
         # card_pics = driver.find_elements(By.XPATH, value='//div[@class="cubre-m-compareCard__pic"]/img')
-        card_pics = self.find_xpaths(value='//div[contains(text(), "已停發")]/..//img')
+        card_pics = self.find_xpaths(value=Cathay_Xpath['已停發圖片連結'])
         card_links = []
         if card_pics:
             for pic in card_pics:
@@ -103,6 +105,8 @@ def question3(n:int):
                 num+=1
         print(f"The last order is {num}")
     else: print('n range should be between 0 to 100')
+
+use_globals_update_keywords(Cathay(), globals())
 
 if __name__=='__main__':
     # 程式邏輯題目
