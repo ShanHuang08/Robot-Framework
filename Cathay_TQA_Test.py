@@ -5,11 +5,13 @@ from Library.SeleniumBase import SeleniumBase
 from Library.Robot_definition import log, run, use_globals_update_keywords
 from Library.WebElements import Cathay_Xpath
 from SeleniumLibrary import SeleniumLibrary
+from selenium.common.exceptions import TimeoutException, ElementNotInteractableException
 
 
 class Cathay(SeleniumBase):
     def __init__(self):
         self.chromedriver_path = 'C:\\Users\\Shan\\Workspace2\\chromedriver.exe'
+        self.firefoxdriver_path = 'C:\\Users\\Shan\\Workspace2\\geckodriver.exe'
         self.url = "https://www.cathaybk.com.tw/cathaybk/"
         self.se_lib = SeleniumLibrary()
 
@@ -56,8 +58,13 @@ class Cathay(SeleniumBase):
 
 
 
-    def Start_Chrome_in_Mobile_View(self):
-        self.se_lib.open_browser(self.url, 'Chrome', executable_path=self.chromedriver_path)
+    def Open_Browser_in_Mobile_View(self, browser:str):
+        if browser.lower() == 'chrome':
+            self.se_lib.open_browser(self.url, browser, executable_path=self.chromedriver_path)
+        elif browser.lower() == 'firefox':
+            self.se_lib.open_browser(self.url, browser, executable_path=self.firefoxdriver_path)
+        else: 
+            raise ValueError(f"Invalid browser name: {browser} ((e.g., chrome or firefox))")
         self.se_lib.set_window_size(width=414, height=996)
         self.se_lib.execute_javascript('window.navigator.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2 like Mac OS X) \
                                         AppleWebKit/605.1.1 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1"')
@@ -75,14 +82,27 @@ class Cathay(SeleniumBase):
             self.se_lib.close_browser()
             num+=1
 
-    def Wait_and_Click_Element(self, locator):
-        self.se_lib.wait_until_page_contains_element(locator)
-        self.se_lib.click_element(locator)
+    def Wait_and_Click_Element(self, locator, timeout=30):
+        try:
+            self.se_lib.wait_until_page_contains_element(locator)
+            self.se_lib.click_element(locator)
+        except TimeoutException as e:
+            log(f"Timeout waiting for element {locator} after {timeout} seconds.\n{e}", level='WARN')
+            run('Take_Screenshot', f'Click {locator} fail!')
+            raise AssertionError(f"Timeout waiting for element {locator}")
+        except ElementNotInteractableException as e:
+            log(f"Element {locator} is not interactable (e.g., hidden or disabled).\n{e}", level='WARN')
+            run('Take_Screenshot', f'{locator} not interactable')
+            raise AssertionError(f"Element {locator} is not interactable")
+        except Exception as e:
+            log(f"An unexpected error occurred while clicking {locator}: {e}", level='ERROR')
+            run('Take_Screenshot', f'Click {locator} unexpected error')
+            raise AssertionError(f"An unexpected error occurred while clicking {locator}")
 
     def Robot_Keyword_Scrap_Cathay(self):
         # options.add_argument("--headless")  
         # options.add_argument("--disable-gpu")  
-        self.Start_Chrome_in_Mobile_View() 
+        self.Open_Browser_in_Mobile_View('Chrome') 
         self.se_lib.wait_until_element_is_visible('xpath:/html')
         run('Take_Screenshot', 'main page.png')
 
