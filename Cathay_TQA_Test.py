@@ -100,8 +100,6 @@ class Cathay(SeleniumBase):
             raise AssertionError(f"An unexpected error occurred while clicking {locator}")
 
     def Robot_Keyword_Scrap_Cathay(self):
-        # options.add_argument("--headless")  
-        # options.add_argument("--disable-gpu")  
         self.Open_Browser_in_Mobile_View('Chrome') 
         self.se_lib.wait_until_element_is_visible('xpath:/html')
         run('Take_Screenshot', 'main page.png')
