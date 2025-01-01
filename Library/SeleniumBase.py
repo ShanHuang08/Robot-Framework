@@ -23,7 +23,7 @@ class SeleniumBase():
         mobile_emulation = {"deviceName": "iPhone X"}
         self.option.add_experimental_option("mobileEmulation", mobile_emulation)
         self.driver = webdriver.Chrome(service=self.service, options=self.option)
-        log(f'Launch hrome_WAP driver')
+        log(f'Launch Chrome_WAP driver')
         return self.driver
 
     def Firefox_Web(self, path):

@@ -58,11 +58,11 @@ class Cathay(SeleniumBase):
 
 
 
-    def Open_Browser_in_Mobile_View(self, browser:str):
+    def Open_Browser_in_Mobile_View(self, url, browser:str):
         if browser.lower() == 'chrome':
-            self.se_lib.open_browser(self.url, browser, executable_path=self.chromedriver_path)
+            self.se_lib.open_browser(url, browser, executable_path=self.chromedriver_path)
         elif browser.lower() == 'firefox':
-            self.se_lib.open_browser(self.url, browser, executable_path=self.firefoxdriver_path)
+            self.se_lib.open_browser(url, browser, executable_path=self.firefoxdriver_path)
         else: 
             raise ValueError(f"Invalid browser name: {browser} ((e.g., chrome or firefox))")
         self.se_lib.set_window_size(width=414, height=996)
@@ -76,7 +76,7 @@ class Cathay(SeleniumBase):
         num = 1
         for link in card_links:
             ob_filename = f'Obsolete_card_{num}.png'
-            self.se_lib.open_browser(link, 'Chrome', executable_path=self.chromedriver_path)
+            self.Open_Browser_in_Mobile_View(link, 'Chrome') 
             sleep(2)
             run('Take_Screenshot', ob_filename)
             self.se_lib.close_browser()
@@ -100,7 +100,7 @@ class Cathay(SeleniumBase):
             raise AssertionError(f"An unexpected error occurred while clicking {locator}")
 
     def Robot_Keyword_Scrap_Cathay(self):
-        self.Open_Browser_in_Mobile_View('Chrome') 
+        self.Open_Browser_in_Mobile_View(self.url, 'Chrome') 
         self.se_lib.wait_until_element_is_visible('xpath:/html')
         run('Take_Screenshot', 'main page.png')
 
