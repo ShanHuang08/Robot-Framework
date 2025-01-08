@@ -1,6 +1,7 @@
 from Library.Robot_definition import run, run_many, log, log_color, log_hyperlink, skip, fail, use_globals_update_keywords
 from random import randint
 from Library.BaseFunctions import BaseFunction
+from robot.api.deco import keyword
 
 
 class My_methods(BaseFunction):
@@ -147,6 +148,18 @@ class My_methods(BaseFunction):
     def zip_performance_comparison(self):
         for times in [50000, 100000, 500000, 1000000]:
             run('test_zip_performance', times)
+
+    @keyword('Move files to ${Folder} folder')
+    def Move_files_to_report_folder(self, Folder):
+        log(f'This is Move files to {Folder} folder main function!')
+        pass
+
+    def Call_keyword_contains_variable(self):
+        folder_name = 'Test Report'
+        log_color('Not use Variable', color='blue')
+        run('Move files to Test Report folder')
+        log_color('Use Variable folder_name', color='blue')
+        run(f'Move files to {folder_name} folder')
 
 use_globals_update_keywords(My_methods(), globals())
 

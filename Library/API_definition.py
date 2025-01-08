@@ -3,13 +3,13 @@ import urllib3
 from Library.Robot_definition import log
 urllib3.disable_warnings()
 
-def GET_Request(url, auth=None, timeout=20, retries=3, exp_code=None):
+def GET_Request(url, params=None, auth=None, timeout=20, retries=3, exp_code=None):
     """
-    Default auth = `None`, timeout `20 secs`, retries `3 times`.
+    `params=None`, Default auth = `None`, timeout `20 secs`, retries `3 times`.
     """
     try:
-        Get_data = requests.get(url=url, auth=auth, verify=False, timeout=timeout)
-        log(f"making GET request {url} and expeted return {exp_code}")
+        Get_data = requests.get(url=url, params=params, auth=auth, verify=False, timeout=timeout)
+        log(f"making GET request {url}, params is {params} and expeted return {exp_code}")
     except requests.exceptions.ConnectTimeout as e:
         log(f'ConnectTimeout: {e}')
         Retry_api(url, auth, retries)
@@ -27,13 +27,13 @@ def GET_Request(url, auth=None, timeout=20, retries=3, exp_code=None):
         raise Exception(f"Status code should be {exp_code} but it is {Get_data.status_code}\nResponse body:")
     return Get_data
 
-def PATCH_Request(url, auth, body, timeout=10, exp_code=None):
+def PATCH_Request(url, auth, body, params=None,  timeout=10, exp_code=None):
     """
-    Timeout `10 secs`, `json=body`
+    `params=None`, Timeout `10 secs`, `json=body`
     """
     try:
-        Patch_data = requests.patch(url=url, auth=auth, json=body, verify=False, timeout=timeout)
-        log(f"making PATCH request {url} with body {body} and expeted return {exp_code}")
+        Patch_data = requests.patch(url=url, params=params, auth=auth, json=body, verify=False, timeout=timeout)
+        log(f"making PATCH request {url} withp params {params} and body {body} and expeted return {exp_code}")
         
     except requests.exceptions.HTTPError as e:
         raise Exception(f'HTTPError: {e}')
@@ -49,13 +49,13 @@ def PATCH_Request(url, auth, body, timeout=10, exp_code=None):
     return Patch_data
 
 
-def POST_Request(url, auth, body=None, timeout=10, exp_code=None):
+def POST_Request(url, auth, body, params=None,  timeout=10, exp_code=None):
     """
-    Timeout `10 secs`, Default body = `None` `json=body`
+    `params=None`, Timeout `10 secs`, Default body = `None` `json=body`
     """
     try:
-        Post_data = requests.post(url=url, auth=auth, json=body, verify=False, timeout=timeout)
-        log(f"making POST request {url} with body {body} and expeted return {exp_code}")
+        Post_data = requests.post(url=url, params=params, auth=auth, json=body, verify=False, timeout=timeout)
+        log(f"making POST request {url} withp params {params} and body {body} and expeted return {exp_code}")
         
     except requests.exceptions.HTTPError as e:
         raise Exception(f'HTTPError: {e}')
@@ -70,13 +70,13 @@ def POST_Request(url, auth, body=None, timeout=10, exp_code=None):
         raise Exception(f"Status code should be {exp_code} but it is {Post_data.status_code}\nResponse body:")
     return Post_data
 
-def DELETE_Request(url, auth, exp_code=None):
+def DELETE_Request(url, auth, params=None,  exp_code=None):
     """
-    Timeout `10 secs`
+    `params=None`, Timeout `10 secs`
     """
     try:
-        Delete_data = requests.delete(url=url, auth=auth, verify=False, timeout=10, exp_code=None)
-        log(f"making DELETE request {url} and expeted return {exp_code}")
+        Delete_data = requests.delete(url=url, params=params, auth=auth, verify=False, timeout=10, exp_code=None)
+        log(f"making DELETE request {url}, params is {params} and expeted return {exp_code}")
     except requests.exceptions.HTTPError as e:
         raise Exception(f'HTTPError: {e}')
     except requests.exceptions.ConnectTimeout as e:

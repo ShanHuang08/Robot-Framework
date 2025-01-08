@@ -9,6 +9,7 @@ Test Timeout    5 minutes
 
 *** Variables ***
 @{ournames}=    Allen    Bob    Casey
+${Folder_Name}=    Tester
 
 *** Keywords ***
 Gen Two Lists
@@ -80,3 +81,8 @@ Zip Methods Comparison
     [Tags]    output
     [Documentation]    3 methods process time Comparison that transfer 2 lists to dict
     Zip Performance Comparison
+
+Call Variable Keywords to here
+    Call Keyword Contains Variable
+    Log    Folder_Name is ${Folder_Name}
+    Move files to ${Folder_Name} folder
