@@ -8,3 +8,7 @@ Cathay_Xpath = {
     '已停發' : '//*[contains(text(), "已停發")]',
     '已停發圖片連結' : '//div[contains(text(), "已停發")]/..//img'
     }
+
+Twitch_Xpath = {
+    
+}

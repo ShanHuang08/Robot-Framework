@@ -1,5 +1,5 @@
 from random import randint, choice, randrange
-from Robot_definition import log_color
+from Robot_definition import log_color, log
 import time
 
 class BaseFunction():
@@ -50,6 +50,16 @@ class BaseFunction():
                   '#008080', '#006400', '#ff00ff']
         return choice(colors)
     
+    def Check_ipaddr(self, ip:str):
+        """ping -n 2 ip address or url"""
+        import subprocess
+        if ip.startswith('http'): ip = ip.split('//')[-1]
+        if ip.endswith('/'): ip = ip[:-1]
+        command = 'ping -n 2 ' + ip
+        Ping = subprocess.run(command, shell=True, capture_output=True, universal_newlines=True)
+        return True in ['TTL=' in line for line in Ping.stdout.splitlines()], Ping.stdout.splitlines()
+    
+basic_func = BaseFunction()
 
 
     
