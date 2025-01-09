@@ -161,6 +161,28 @@ class My_methods(BaseFunction):
         log_color('Use Variable folder_name', color='blue')
         run(f'Move files to {folder_name} folder')
 
+    def Move_files_to_report_folder(self, Folder):
+        import subprocess, os
+        output = subprocess.run('cd', shell=True, capture_output=True, universal_newlines=True)
+        directory = output.stdout.splitlines()[0]
+        # Folder_loc = Folder_loc = os.path.join(directory[0], Folder)
+        Folder_loc = f'"{directory}\\{Folder}"' # "folder name" Handle folder name contains space
+        if not os.path.isdir(Folder_loc):
+            os.mkdir(Folder)
+        else: print(f"{Folder} already existed")
+
+        files = os.listdir(directory)
+        # Move files to folder
+        for file in files:
+            try:
+                if any(file.endswith(typ) for typ in ['png', 'html', 'xml', 'txt']):
+                    file = f'"{file}"'
+                    print(f'move {file} {Folder_loc}')
+                    subprocess.run(f'move {file} {Folder_loc}', shell=True, capture_output=True, universal_newlines=True)
+            except FileNotFoundError as e:
+                print(f'FileNotFoundError: {e}')
+                continue
+
 use_globals_update_keywords(My_methods(), globals())
 
     

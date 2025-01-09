@@ -10,5 +10,16 @@ Cathay_Xpath = {
     }
 
 Twitch_Xpath = {
-    
+    'Click Browse' : '//a[@href="/directory"]//div[contains(text(), "瀏覽")]',
+    'Search input field' : '//header[@id="twilight-sticky-header-root"]//input[@placeholder="搜尋"]',
+    'StarCraft II icon' : '//img[@alt="StarCraft II"]',
+    'StarCraft II title' : '//p[@title="StarCraft II"]',
+    'Follow button' : '//button[@data-a-target="game-directory-follow-button"]',
+    '3rd video pic' : '//main[@id="page-main-content-wrapper"]//div[@role="list"]/div[3]//img[@class="tw-image"]',
+    'h1 title' : '//h1[contains(text(), "StarCraft II")]',
+    'Description' : '//main[@id="page-main-content-wrapper"]//p//span',
+    '4th video pic' : '//*[@id="page-main-content-wrapper"]/div[3]/div/div/div[4]//img[@class="tw-image"]',
+    '5th video pic' : '//*[@id="page-main-content-wrapper"]/div[3]/div/div/div[5]//img[@class="tw-image"]',
+    'Video Controller' : '//section[@id="channel-player"]',
+    'Check controller is hidden' : '//section[@id="channel-player"]/parent::div[@data-a-visible="false"]'
 }
