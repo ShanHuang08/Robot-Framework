@@ -1,7 +1,6 @@
-from Library.Robot_definition import log, log_color, run, fail, use_globals_update_keywords
+from Library.Robot_definition import log, log_color, run, fail, get_lib_instance, use_globals_update_keywords
 from Library.SeleniumLibraryBase import SeleniumLibBase, SeleniumLibrary
 from Library.BaseFunctions import basic_func
-from Library.Robot_definition import get_lib_instance
 from Library.WebElements import Twitch_Xpath
 from Library.API_definition import API_Methods
 import json
@@ -14,6 +13,7 @@ class Twitch_test(SeleniumLibBase):
         self.url = "https://m.twitch.tv/"
         get_lib_instance('SeleniumLibBase', all_=True)
         self.api = API_Methods()
+        self.api_url = 'https://api.ipstack.com/134.201.250.155'
         
     
     def Check_Network_Connection(self):
@@ -67,26 +67,28 @@ class Twitch_test(SeleniumLibBase):
         # Check video controller
         self.se_lib.wait_until_element_is_visible('xpath:'+Twitch_Xpath["Video Controller"], timeout=10)
         # Check video controller is hidden
-        self.se_lib.wait_until_element_is_visible('xpath:'+Twitch_Xpath["Check controller is hidden"], timeout=20)
+        try:
+            self.se_lib.wait_until_element_is_visible('xpath:'+Twitch_Xpath["Check controller is hidden"], timeout=10)
+        except:
+            self.se_lib.wait_until_element_is_visible('xpath:'+Twitch_Xpath["Check controller div is hidden"], timeout=10)
         run('Capture_a_Screenshot', 'Live Streaming.png')
         self.se_lib.close_all_browsers()
     
   
     def GET_Basic_Standard_IP_Lookup_positive(self):
         err = []
-        url = 'https://api.ipstack.com/134.201.250.155'
-        url = self.inspect_url(url)
+        url = self.inspect_url(self.api_url)
         key = "access_key"
         value = 'e5a62f828501ddd4e33acfd3949f81f3'
         exp_status = 200
-        exp_url = self.expect_url(url, [key, value])
+        exp_url = self.expect_url(url, {key : value})
 
         res = self.api.GET_Request(url, params={key : value}, exp_code=exp_status)
         # Check status code
         if not self.Check_if_status_code_match(res.status_code, exp_status): 
             err.append(f'Check status code failed! {res.status_code} != {exp_status}')
 
-        # Check access key
+        # Check url match as expected
         if not self.Check_param_urls(res.url, exp_url): 
             err.append(f'Check access key failed! {res.url} != {exp_url}')
 
@@ -113,25 +115,21 @@ class Twitch_test(SeleniumLibBase):
 
     def GET_Basic_Standard_IP_Lookup_negative(self):
         err = []
-        url = 'https://api.ipstack.com/134.201.250.155'
-        url = self.inspect_url(url)
+        url = self.inspect_url(self.api_url)
 
         Test_params = [({'access_key' : 'key'}, 200),
                        ({'access_key' : '123'}, 200),
                        ({'access_key' : ''}, 200)
                        ]
         for param, exp_status in Test_params:
-            arg_list = [] # len=1
-            for key, value in param.items():
-                arg_list.append([key, value])
-            exp_url = self.expect_url(url, *arg_list) # *arg_list seperate list content
+            exp_url = self.expect_url(url, param) # *arg_list seperate list content
 
             res = self.api.GET_Request(url, params=param, exp_code=exp_status)
             # Check status code
             if not self.Check_if_status_code_match(res.status_code, exp_status): 
                 err.append(f'Check status code failed! {res.status_code} != {exp_status}')
 
-            # Check access key
+            # Check url match as expected
             if not self.Check_param_urls(res.url, exp_url): 
                 err.append(f'Check access key failed! {res.url} != {exp_url}')            
           
@@ -142,6 +140,7 @@ class Twitch_test(SeleniumLibBase):
 
             # Check response values
                 response = res.json()
+                value = ''.join(v for v in param.values())
                 if value == '':
                     exp_value = [False, 101, "missing_access_key", "You have not supplied an API Access Key. [Required format: access_key=YOUR_ACCESS_KEY]"]
                 else:
@@ -161,8 +160,7 @@ class Twitch_test(SeleniumLibBase):
 
     def Set_Valid_and_Invalid_Hostname(self):
         err = []
-        url = 'https://api.ipstack.com/134.201.250.155'
-        url = self.inspect_url(url)
+        url = self.inspect_url(self.api_url)
         key = 'e5a62f828501ddd4e33acfd3949f81f3'
 
         Test_params = [({'access_key' : key, 'hostname' : 1}, 200),
@@ -171,29 +169,22 @@ class Twitch_test(SeleniumLibBase):
                        ]
 
         for param, exp_status in Test_params:
-            arg_list = [] # len=2
-            for key, value in param.items():
-                arg_list.append([key, value])
-
-            exp_url = self.expect_url(url, *arg_list)
+            exp_url = self.expect_url(url, param)
 
             res = self.api.GET_Request(url, params=param, exp_code=exp_status)       
             # Check status code
             if not self.Check_if_status_code_match(res.status_code, exp_status): 
                 err.append(f'Check status code failed! {res.status_code} != {exp_status}')            
 
-            # Check access key
+            # Check url match as expected
             if not self.Check_param_urls(res.url, exp_url): 
                 err.append(f'Check access key failed! {res.url} != {exp_url}')              
 
             # Check res format
             try:
-                if isinstance(res.json(), dict): 
-                    log('Response is JSON format.')
-                    log(res.text, level='DEBUG')
-                else: 
-                    log('<b>Response is NOT JSON format.</b>')
-                    err.append('Response is NOT JSON format.')            
+                if not self.is_res_JSON(res.json()): 
+                    err.append(f"Response is NOT JSON format.")
+    
                 # Check hostname key and value
                 response = res.json()
                 if param["hostname"] in [1, 0]: #valid
@@ -261,13 +252,13 @@ class Twitch_test(SeleniumLibBase):
             else: url = 'https://' + url
         return url
 
-    def expect_url(self, url:str, *arg):
+    def expect_url(self, url:str, arg:dict):
         """Return expected url after GET api with single and mutiple params"""
         url = self.inspect_url(url)
         if url.endswith('/'): url = url[:-1]
         # print(arg)
         num = 1
-        for key, value in arg:
+        for key, value in arg.items():
             if num == 1:
                 url+=f"?{key}={value}"
             else:

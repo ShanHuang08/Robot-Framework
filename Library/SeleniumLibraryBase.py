@@ -64,4 +64,7 @@ class SeleniumLibBase():
         self.se_lib.wait_until_element_is_visible(locator)
         self.se_lib.scroll_element_into_view(locator)
         sleep(1)
+    
+    def Close_down_all_browsers(self):
+        self.se_lib.close_all_browsers()
   

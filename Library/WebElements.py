@@ -21,5 +21,6 @@ Twitch_Xpath = {
     '4th video pic' : '//*[@id="page-main-content-wrapper"]/div[3]/div/div/div[4]//img[@class="tw-image"]',
     '5th video pic' : '//*[@id="page-main-content-wrapper"]/div[3]/div/div/div[5]//img[@class="tw-image"]',
     'Video Controller' : '//section[@id="channel-player"]',
-    'Check controller is hidden' : '//section[@id="channel-player"]/parent::div[@data-a-visible="false"]'
+    'Check controller is hidden' : '//section[@id="channel-player"]/parent::div[@data-a-visible="false"]',
+    'Check controller div is hidden' : '//div[@@data-a-visible="false"]'
 }
