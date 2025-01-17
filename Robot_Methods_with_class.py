@@ -58,7 +58,7 @@ class My_methods(BaseFunction):
         for i in test_tuple:
             if i%2 == 0: log(i)
         next(test_tuple)
-
+    
     def genator_error_with_try_except(self):
         try:
             test_tuple = (num for num in range(5))
@@ -73,7 +73,7 @@ class My_methods(BaseFunction):
         run('for_loop_print_keyowrds', 10)
         run('log_color', 'Google', self.Ramdom_color())
         log_hyperlink('Google link', 'http://www.google.com', print=True)
-
+    
     def test_errors(self):
         try:
             run('type_error_test')
@@ -87,11 +87,10 @@ class My_methods(BaseFunction):
             run('genator_error')
         except:
             run('genator_error_with_try_except')
-
+    
     def test_even_max(self):
         run('skip_on_even_max', randint(1, 20), randint(1, 20))
         
-
     def test_run_many(self):
         run_many('print fruit', 'cars')
 
@@ -120,7 +119,7 @@ class My_methods(BaseFunction):
             "Now the Unix time is localtime: {}".format(f'<b style="color: orange">{year}/{month}/{day} {hour}:{min}:{sec}</b>'), html=True)
         log_color("Use log_color()\nNow the Unix time is asctime {}".format(time.asctime()) + '\n' + 
             "Now the Unix time is localtime: {}".format(f"{year}/{month}/{day} {hour}:{min}:{sec}"), self.Ramdom_color())
-
+    
     def test_zip_performance(self, list_length):
         keys = self.generate_random_list(list_length)
         values = self.generate_random_list(list_length)
