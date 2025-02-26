@@ -24,6 +24,9 @@ def log_hyperlink(msg, link, print=False, level='INFO', html=True, console=False
         else: return f'<a href="{link}" target="_blank">{msg}</a>'
     else: raise AttributeError('Wrong hyperlink format!')
 
+def log_img(src, size='20', html=True, level='INFO', console=False):
+    BuiltIn().log(f'<img src="{src}", width="{size}%", height="{size}%"></img>', level=level, html=html, console=console)
+
 def skip(msg):
     """Run `BuiltIn.skip(msg)`"""
     BuiltIn.skip(msg)
