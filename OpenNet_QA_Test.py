@@ -106,11 +106,7 @@ class Twitch_test(SeleniumLibBase):
             log(f"{e}\nCheck response format failed! {res.text}")
             err.append("Check response format failed!")
         
-        if err: 
-            err_msg = '\n'.join(msg for msg in err)
-            log_color('Test FAIL', color='red')
-            fail(f'Error: {err_msg}')
-        else: log_color('Test PASS', color='blue')
+        self.Final_Test_result(err)
 
 
     def GET_Basic_Standard_IP_Lookup_negative(self):
@@ -151,11 +147,8 @@ class Twitch_test(SeleniumLibBase):
             except json.decoder.JSONDecodeError as e:
                 log(f"{e}\nCheck response format failed! {res.text}")
                 err.append("Check response format failed!")
-        if err: 
-            err_msg = '\n'.join(msg for msg in err)
-            log_color('Test FAIL', color='red')
-            fail(f'Error: {err_msg}')
-        else: log_color('Test PASS', color='blue')
+
+        self.Final_Test_result(err)
 
 
     def Set_Valid_and_Invalid_Hostname(self):
@@ -208,11 +201,7 @@ class Twitch_test(SeleniumLibBase):
                 log(f"{e}\nCheck response format failed! {res.text}")
                 err.append("Check response format failed!")
 
-        if err: 
-            err_msg = '\n'.join(msg for msg in err)
-            log_color('Test FAIL', color='red')
-            fail(f'Error: {err_msg}')
-        else: log_color('Test PASS', color='blue')
+        self.Final_Test_result(err)
 
 
     def Check_if_status_code_match(self, actual, expect):
@@ -336,5 +325,13 @@ class Twitch_test(SeleniumLibBase):
             num+=1
             log(err, level='DEBUG')
         return len(err) == 0
+
+    def Final_Test_result(self, err:list):
+        if err:
+            err_msg = '\n'.join(msg for msg in err)
+            log_color('Test FAIL', color='red')
+            fail(f'Error: {err_msg}')
+        else: log_color('Test PASS', color='blue')
+
 
 use_globals_update_keywords(Twitch_test(), globals())

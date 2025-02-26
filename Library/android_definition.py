@@ -1,5 +1,5 @@
 import uiautomator2 as ui_auto
-from Popen_test import Cmd_Runner
+from Library.Cmd_Runner import Cmd_Runner
 from adbutils import AdbError
 from Library.Robot_definition import log, log_color, log_img, run, use_globals_update_keywords
 from time import sleep
@@ -137,7 +137,7 @@ class UI_autoFunctions(Cmd_Runner):
                     if self.d(description=value).exists:
                         self.d(escription=value).click()
                         break
-                sleep(0.5)
+            sleep(0.5)
             
     def Check_device_on_HomeScreen(self, times=2):
         """Check **com.google.android.apps.nexuslauncher:id/launcher** exist"""
