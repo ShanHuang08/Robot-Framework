@@ -38,6 +38,13 @@ class Cmd_Runner():
                     process.stdin.write(data_in)
                     process.stdin.flush()
                     time.sleep(0.5)
+                elif isinstance(data_in, dict):
+                    for _, v in data_in.items():
+                        process.stdin.write(v)
+                        process.stdin.flush()
+                        time.sleep(0.5)
+                else:
+                    print('data_in arg does not support other than list, str and dict')
 
                 process.stdin.close()
             
