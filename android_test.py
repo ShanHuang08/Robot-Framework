@@ -7,12 +7,13 @@ class UI_Test(UI_autoFunctions):
 
     def Open_Weather_forcast_live(self):
         """Open `com.accurate.weather.forecast.live` app"""
+        App_name = 'com.accurate.weather.forecast.live'
         self.d.press("home")
         sleep(1)
 
         # Launch app
-        self.d.app_start("com.accurate.weather.forecast.live")
-        log('Launch com.accurate.weather.forecast.live')
+        self.d.app_start(App_name)
+        log(f'Launch {App_name}')
         sleep(5) #Loading time
 
         # Skip AD pages
@@ -21,22 +22,22 @@ class UI_Test(UI_autoFunctions):
         # Skip upgrade page
         if self.d(text="高級專業版").exists:
             log('Skip upgrade page')
-            self.Wait_for_Element_and_Click(timeout=5, resourceId="com.accurate.weather.forecast.live:id/iv_close")
+            self.Wait_for_Element_and_Click(timeout=5, resourceId=App_name + ":id/iv_close")
 
         # Skip rate pop-up dialog
-        if self.d(resourceId="com.accurate.weather.forecast.live:id/rate_close").exists:
+        if self.d(resourceId=App_name + ":id/rate_close").exists:
             log("Skip rate pop-up dialog")
-            self.Wait_for_Element_and_Click(timeout=5, resourceId="com.accurate.weather.forecast.live:id/rate_close")
+            self.Wait_for_Element_and_Click(timeout=5, resourceId=App_name + ":id/rate_close")
 
         # Check APP main page
-        Check_Main_page = self.Wait_for_Element(text="未來2小時預報", resourceId="com.accurate.weather.forecast.live:id/btn_radar")
+        Check_Main_page = self.Wait_for_Element(text="未來2小時預報", resourceId=App_name + ":id/btn_radar")
         if Check_Main_page:
             log_color('Weather Forcast App has launched sucessfully', 'blue')
             run('Screenshot_with_log_img', 'Weather_Forcast_App.png')
             self.Get_Current_Weather_Content()
 
         # Exit app
-        self.Exit_Weather_Live(resourceId="com.accurate.weather.forecast.live:id/btn_exit")
+        self.Exit_Weather_Live(resourceId=App_name + ":id/btn_exit")
 
     def Check_device_connection(self):
         check = self.is_device_alive()
