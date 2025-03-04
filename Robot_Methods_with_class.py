@@ -149,16 +149,17 @@ class My_methods(BaseFunction):
             run('test_zip_performance', times)
 
     @keyword('Move files to ${Folder} folder')
-    def Move_files_to_report_folder(self, Folder):
-        log(f'This is Move files to {Folder} folder main function!')
+    def Move_files_to_report(self, Folder):
+        log(f'Utilize variable <b>{Folder}</b> to call Move files to {Folder} folder function!')
         pass
 
     def Call_keyword_contains_variable(self):
-        folder_name = 'Test Report'
+        folder_name = 'Test Report 0228'
+        folder_name2 = 'Test Report 0229'
         log_color('Not use Variable', color='blue')
-        run('Move files to Test Report folder')
+        run('Move files to Report folder', folder_name)
         log_color('Use Variable folder_name', color='blue')
-        run(f'Move files to {folder_name} folder')
+        run(f'Move files to {folder_name2} folder')
 
     def Move_files_to_report_folder(self, Folder):
         import subprocess, os

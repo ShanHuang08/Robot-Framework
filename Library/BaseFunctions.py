@@ -12,7 +12,7 @@ class BaseFunction():
         elif 10 < high_num < 50: start_num = high_num/5
         elif 50 < high_num < 100: start_num = high_num/10
         else: start_num = high_num/50
-        return [str(randint(low_num, high_num)) for _ in range(randint(start_num, high_num))]
+        return [str(randint(low_num, high_num)) for _ in range(randint(int(start_num), high_num))]
     
     def generate_random_list(self, length):
         return [randint(0, 1000) for _ in range(length)]
@@ -46,17 +46,18 @@ class BaseFunction():
         - IndianRed`: #CD5C5C` - LightCoral`: #F08080` - Navy`: #000080`
         - Teal`: #008080` - Darkgreen`: #006400` - Fuchsia`: #ff00ff`
         """
-        colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#808080', '#FFA500', '#800080', '#00FFFF', '#CD5C5C', '#F08080', '#000080',
+        colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#808080', 
+                  '#FFA500', '#800080', '#00FFFF', '#CD5C5C', '#F08080', '#000080',
                   '#008080', '#006400', '#ff00ff']
         return choice(colors)
     
     def Check_ipaddr(self, ip:str):
         """ping -n 2 ip address or url"""
-        import subprocess
+        from Cmd_Runner import Cmd_Runner
         if ip.startswith('http'): ip = ip.split('//')[-1]
         if ip.endswith('/'): ip = ip[:-1]
         command = 'ping -n 2 ' + ip
-        Ping = subprocess.run(command, shell=True, capture_output=True, universal_newlines=True)
+        Ping = Cmd_Runner().Run_cmd(command)
         return True in ['TTL=' in line for line in Ping.stdout.splitlines()], Ping.stdout.splitlines()
     
 basic_func = BaseFunction()
