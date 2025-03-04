@@ -232,9 +232,9 @@ class UI_autoFunctions(Cmd_Runner):
         """Take screenshot and log png"""
         if '.png' in filename:
             self.d.screenshot(filename)
-            current_directory = os.getcwd()
-            src = current_directory + '\\' +filename
-            log_img(src)
+            # current_directory = os.getcwd()
+            # src = current_directory + '\\' +filename
+            log_img(filename)
         else: log_color('File name format is incorrect\nCan not capture screenshot', color='red')
 
 use_globals_update_keywords(UI_autoFunctions(), globals())

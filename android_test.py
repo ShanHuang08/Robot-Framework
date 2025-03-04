@@ -35,7 +35,7 @@ class UI_Test(UI_autoFunctions):
             log_color('Weather Forcast App has launched sucessfully', 'blue')
             run('Screenshot_with_log_img', 'Weather_Forcast_App.png')
             self.Get_Current_Weather_Content()
-
+        else: fail('Fail to enter app main page')
         # Exit app
         self.Exit_Weather_Live(resourceId=App_name + ":id/btn_exit")
 
