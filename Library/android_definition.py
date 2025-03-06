@@ -3,7 +3,7 @@ from Library.Cmd_Runner import Cmd_Runner
 from adbutils import AdbError
 from Library.Robot_definition import log, log_color, log_img, run, use_globals_update_keywords
 from time import sleep
-import os
+import os, re
 
 class UI_autoFunctions(Cmd_Runner):
     def __init__(self):
@@ -52,30 +52,28 @@ class UI_autoFunctions(Cmd_Runner):
         if self.Check_adb_env():
             d_id = self.pair_device(ip_port, pair_code)
             device_id = None
-            output = self.Run_cmd('adb devices')
-            if d_id in output.stdout:
-                for out in output.stdout.splitlines():
-                    if d_id in out:
-                        device_id = out.split('\t')[0]
-                return device_id
-            else: 
-                print(f'{d_id} is not detected\n{output.stdout}')
+            for _ in range(30): # Wait for pair completed
+                output = self.Run_cmd('adb devices')
+                if d_id[:-1] in output.stdout:
+                    for out in output.stdout.splitlines():
+                        if d_id[:-1] in out:
+                            device_id = out.split('\t')[0]
+                    return device_id
+                sleep(1)  
+            print(f'{d_id[:-1]} is not detected\n{output.stdout}')
 
     def pair_device(self, ip_port, pair_code):
         """cmd" `adb pair ip:port`
         
         Input pair code"""
-        pair = False
         guid=None
         cmd = 'adb pair ' + ip_port
         output = self.Run_cmd(cmd, data_in=pair_code)
-        if 'Successfully paired to' in output.stdout: 
-            pair=True
-            guid = output.stdout.split('=')[-1][:-1] 
-            print(f'GUID={guid}') # GUID=adb-39071FDJG0037M-mFgVOc
-
-        if pair:
-            print(f"Return code: {output.returncode}\nOutput: {output.stdout}")
+        match = re.search(r"\[(.*?)\]", output.stdout)
+        # guid = output.stdout.split('=')[-1][:-1] # Not work
+        if match: 
+            guid = match.group(1).split('=')[-1]
+            print(f'GUID={guid}\nReturn code: {output.returncode}\nOutput: {output.stdout}') # GUID=adb-39071FDJG0037M-mFgVOc
             return guid
         else:
             if output.stderr:
@@ -237,4 +235,4 @@ class UI_autoFunctions(Cmd_Runner):
             log_img(filename)
         else: log_color('File name format is incorrect\nCan not capture screenshot', color='red')
 
-use_globals_update_keywords(UI_autoFunctions(), globals())
+# use_globals_update_keywords(UI_autoFunctions(), globals())

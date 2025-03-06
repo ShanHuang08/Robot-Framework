@@ -20,7 +20,7 @@ class Cmd_Runner():
         except subprocess.TimeoutExpired:
             print(f"Error: Command '{cmd}' timed out after {timeout} seconds.")
 
-    def Popen_cmd(self, cmd, data_in=None, timeout=10):
+    def Popen_cmd(self, cmd, *data_in, timeout=10):
         """`Popen()` supports input mutiple times
 
         return **process.returncode**, **stdout**/**stderr**"""
@@ -28,25 +28,14 @@ class Cmd_Runner():
             cmd_list = cmd.split(' ')
             process = subprocess.Popen(cmd_list, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             # print(process) #<Popen: returncode: None args: ['ping']>
+            print(data_in)
             if data_in:
-                if isinstance(data_in, list):
-                    for data in data_in:
-                        process.stdin.write(data)
-                        process.stdin.flush() # Make sure input value deliver immediatelly
-                        time.sleep(0.5) # Waiting for set /p handle input data
-                elif isinstance(data_in, str):
-                    process.stdin.write(data_in)
-                    process.stdin.flush()
+                for data in data_in:
+                    process.stdin.write(data)
+                    process.stdin.flush() # Make sure input value deliver immediatelly
                     time.sleep(0.5)
-                elif isinstance(data_in, dict):
-                    for _, v in data_in.items():
-                        process.stdin.write(v)
-                        process.stdin.flush()
-                        time.sleep(0.5)
-                else:
-                    print('data_in arg does not support other than list, str and dict')
 
-                process.stdin.close()
+            process.stdin.close()
             
             stdout, stderr = process.communicate(timeout=timeout)
 
