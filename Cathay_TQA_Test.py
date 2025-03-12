@@ -109,7 +109,6 @@ class Cathay(SeleniumLibBase):
 use_globals_update_keywords(Cathay(), globals())
 
 # TQA測試: 程式邏輯題目
-import random
 def question1(input_list:list):
     """
     - Input: [35, 46, 57, 91, 29]
@@ -119,7 +118,7 @@ def question1(input_list:list):
         digit = str(digit)
         if len(digit) == 2: return int(str(digit[-1]) + str(digit[0]))
     output_list = [reverse_double_digit(num) for num in input_list]
-    print(output_list)
+    return output_list
 
 
 def question2(input_text:str):
@@ -138,7 +137,7 @@ def question2(input_text:str):
             exclude.append(text)
     sorted_list = sorted(text_dict.items())
     answer = '\n'.join(ans[0]+' '+str(ans[1]) for ans in sorted_list)
-    print(answer)
+    return answer
 
 
 def question3(n:int):
@@ -146,14 +145,14 @@ def question3(n:int):
     - Input: 0-100
     - Output: The last order is {num}
     """
-    if 0 <= n <= 100:
+    if not 0 <= n <= 100: 
+        print('n range should be between 0 to 100')
+    else: 
         num = 1
         for i in range(n):
             if i % 3 != 0:
                 num+=1
         print(f"The last order is {num}")
-    else: print('n range should be between 0 to 100')
-
 
 
 if __name__=='__main__':

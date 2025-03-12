@@ -37,7 +37,6 @@ class UI_autoFunctions(Cmd_Runner):
 
     def Get_device_id(self):
         """Get device id on single case"""
-        import re
         output = self.Run_cmd("adb devices")
         match = re.search(r"(\S+)\s+device", output.stdout)
         if match:
@@ -235,4 +234,4 @@ class UI_autoFunctions(Cmd_Runner):
             log_img(filename)
         else: log_color('File name format is incorrect\nCan not capture screenshot', color='red')
 
-# use_globals_update_keywords(UI_autoFunctions(), globals())
+use_globals_update_keywords(UI_autoFunctions(), globals())

@@ -28,7 +28,6 @@ class Cmd_Runner():
             cmd_list = cmd.split(' ')
             process = subprocess.Popen(cmd_list, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             # print(process) #<Popen: returncode: None args: ['ping']>
-            print(data_in)
             if data_in:
                 for data in data_in:
                     process.stdin.write(data)
