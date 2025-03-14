@@ -1,11 +1,12 @@
 *** Settings ***
-Library    Cathay_TQA_Test.py
+Library    Cathay_Auto_Test.py
 
 *** Test Cases ***
-Cathay TQA Test
+Cathay Auto Test
     [Tags]    Selenium
     Scrap_Cathay
+    [Teardown]    Close_Browser
 
-Use Robot Keyword to run Cathay TQA Test
+Use Robot Keyword to run Cathay Auto Test
     [Tags]    SeleniumLibrary
     Robot_Keyword_Scrap_Cathay

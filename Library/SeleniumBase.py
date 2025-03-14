@@ -5,25 +5,34 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from Robot_definition import log
-from time import sleep
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException
+from Robot_definition import log, log_color, log_img, run, fail
+from time import time
 
 
 class SeleniumBase():
     
-    def Chrome_Web(self, path):
+    def Chrome_Web(self, driver_path):
         """File path should include `chromedriver.exe`"""
-        self.driver = webdriver.Chrome(service=Service(path))
+        self.driver = webdriver.Chrome(service=Service(driver_path))
         log(f'Launch Chrome_Web driver')
         return self.driver
 
-    def Chrome_WAP(self, path):
-        self.service = Service(path)
-        self.option = Options()
-        mobile_emulation = {"deviceName": "iPhone X"}
-        self.option.add_experimental_option("mobileEmulation", mobile_emulation)
-        self.driver = webdriver.Chrome(service=self.service, options=self.option)
-        log(f'Launch Chrome_WAP driver')
+    def Launch_WAP(self, driver_path):
+        import os
+        driver_name = os.path.basename(driver_path)
+        service = Service(driver_path)
+        option = Options()
+        if 'chrome' in driver_name.lower():
+            mobile_emulation = {"deviceName": "iPhone X"}
+            option.add_experimental_option("mobileEmulation", mobile_emulation)
+            self.driver = webdriver.Chrome(service=service, options=option)
+            log(f'Launch <b style="color:blue">Chrome_WAP</b> driver')
+        elif 'gecko' in driver_name.lower():
+            mobile_emulation = {"deviceName": "iPhone X"}
+            option.add_experimental_option("mobileEmulation", mobile_emulation)
+            self.driver = webdriver.Firefox(service=service, options=option)
+            log(f'Launch <b style="color:blue">Firefox_WAP</b> driver')
         return self.driver
 
     def Firefox_Web(self, path):
@@ -33,68 +42,162 @@ class SeleniumBase():
 
     def find_ID(self, value) -> WebElement:
         #AttributeError: 'NoneType' object has no attribute 'click' add -> -> WebElement and add return
-        log(f'Launch find_ID to find {value}')
+        log(f'Launch find_ID to find {value}', level='DEBUG')
         return self.driver.find_element(By.ID, value=value)
     
     def find_Name(self, value) -> WebElement:
-        log(f'Launch find_Name to find {value}')
+        log(f'Launch find_Name to find {value}', level='DEBUG')
         return self.driver.find_element(By.NAME, value=value)
     
     def find_xpath(self, value) -> WebElement:
-        log(f'Launch find_xpath to find {value}')
-        return self.driver.find_element(By.XPATH, value=value)
+        log(f'Launch find_xpath to find {value}', level='DEBUG')
+        try:
+            return self.driver.find_element(By.XPATH, value=value)
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except ElementNotInteractableException as e:
+            log(f"Element is not interactable: {e}")
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except TimeoutException:
+            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        
     
     def find_IDs(self, value) -> WebElement:
-        log(f'Launch find_ID to find {value} list')
+        log(f'Launch find_ID to find {value} list', level='DEBUG')
         return self.driver.find_elements(By.ID, value=value)
     
     def find_Names(self, value) -> WebElement:
-        log(f'Launch find_Name to find {value} list')
+        log(f'Launch find_Name to find {value} list', level='DEBUG')
         return self.driver.find_elements(By.NAME, value=value)
 
     def find_xpaths(self, value) -> WebElement:
-        log(f'Launch find_xpath to find {value} list')
-        return self.driver.find_elements(By.XPATH, value=value)
+        log(f'Launch find_xpath to find {value} list', level='DEBUG')
+        try:
+            return self.driver.find_elements(By.XPATH, value=value)
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except ElementNotInteractableException as e:
+            log(f"Element is not interactable: {e}")
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except TimeoutException:
+            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        
 
     def get_window_handles(self):
         """return list with handles. Cooperate with `switch_window()`"""
         return self.driver.window_handles
     
-    def Click_Element(self, method, value):
-        from selenium.common.exceptions import ElementNotInteractableException
-        from time import time
-        
+    def Click_it(self, method, value):
         try:
             element = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((method, value)))
             log(f"Click {value}")
             element.click()
         except ElementNotInteractableException as e:
-            log(f"Element is not interactable: {e}")
-            screenshot_name = f"Fail_screenshot_{int(time())}.png"
-            self.driver.save_screenshot(screenshot_name)
-            log(f"Screen has been save as: {screenshot_name}")
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            fail(f"Element is not interactable: {e}")
+        except TimeoutException:
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            fail(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+        except Exception as e:
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            fail(f"An unexpected error occurred: {e}", 'red', level='ERROR')
 
-    def Save_Screenshot(self, method, value, filename, wait_secs=20):
 
+    def Wait_until_element_is_displayed(self, method, value, wait_secs=10):
         try:
-            WebDriverWait(self.driver, wait_secs).until(
+            element = WebDriverWait(self.driver, wait_secs).until(
                 EC.visibility_of_element_located((method, value)))
-            is_element_displayed = self.driver.find_element(method, value).is_displayed()
-            if is_element_displayed:
-                log(f"Save screenshot as {filename}")
-                self.driver.save_screenshot(filename)
-            else: log(f"Element {value} does not display.")
-        except:
-            log(f"Element {value} is unable show up in {wait_secs} seconds")
-            log(f"Save screenshot as Error_{filename}")
-            self.driver.save_screenshot(f"Error_{filename}")
+            log_color(f"Element {value} is displayed.", 'blue')
+            return element
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        except TimeoutException:
+            log_color(f"Element {value} was not visible within {wait_secs} seconds.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
     
-    def Get_Card_Screenshots(self, card_links):
-        num = 1
-        for link in card_links:
-            ob_filename = f'Obsolete_card_{num}.png'
-            self.driver.get(link)
-            sleep(2)
-            self.Save_Screenshot(By.XPATH, '/html', ob_filename)
-            num+=1
+
+    def Wait_until_element_is_enabled(self, method, value, wait_secs=10):
+        try:
+            element = WebDriverWait(self.driver, wait_secs).until(
+                EC.element_to_be_clickable((method, value)))
+            log_color(f"Element {value} does not enable.", 'blue')
+            return element
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        except TimeoutException:
+            log_color(f"Element {value} did not enabled within {wait_secs} seconds.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+
+
+    def Wait_until_page_Contain_element(self, method, value, wait_secs=10):
+        try:
+            element = WebDriverWait(self.driver, wait_secs).until(
+                EC.presence_of_element_located((method, value)))
+            log_color(f"Element {value} is detected.", 'blue')
+            return element
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        except TimeoutException:
+            log_color(f"Element {value} did not detected within {wait_secs} seconds.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+    
+
+    def Wait_until_element_is_selected(self, method, value, wait_secs=10):
+        try:
+            element = WebDriverWait(self.driver, wait_secs).until(
+                EC.element_located_to_be_selected((method, value)))
+            log_color(f"Element {value} does not be selected.", 'blue')
+            return element
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        except TimeoutException:
+            log_color(f"Element {value} did not selected within {wait_secs} seconds.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+            return None
+        
+
+    def Save_Screenshot(self, filename):
+        self.driver.save_screenshot(f"{filename}")
+        log_img(filename)
+    
+    def Scroll_into_view_on_Base(self, locator):
+        self.Wait_until_element_is_displayed(By.XPATH, locator)
+        self.find_xpath(locator).location_once_scrolled_into_view
