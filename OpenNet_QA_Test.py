@@ -7,8 +7,6 @@ import json
 
 class Twitch_test(SeleniumLibBase):
     def __init__(self):
-        self.chromedriver_path = 'C:\\Users\\Shan\\Workspace2\\chromedriver.exe'
-        self.firefoxdriver_path = 'C:\\Users\\Shan\\Workspace2\\geckodriver.exe'
         self.se_lib = SeleniumLibrary()
         self.url = "https://m.twitch.tv/"
         get_lib_instance('SeleniumLibBase', all_=True)
@@ -25,7 +23,7 @@ class Twitch_test(SeleniumLibBase):
     def Twitch_Scrape(self):
         """Utilize Robot Framework as a test runner"""
         # Go to Twitch main page as WAP view
-        self.Open_Browser_in_Mobile_View(self.url, driver_path=self.chromedriver_path)
+        self.Open_Browser_in_Mobile_View(self.url, 'chrome')
         self.se_lib.wait_until_element_is_visible('xpath:/html')
         run('Capture_a_Screenshot', 'main page.png')
 
