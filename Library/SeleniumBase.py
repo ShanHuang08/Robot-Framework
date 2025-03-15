@@ -5,49 +5,89 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException, SessionNotCreatedException, WebDriverException
 from Robot_definition import log, log_color, log_img, run, fail
 from time import time
-
+from Library.BaseFunctions import basic_func
 
 class SeleniumBase():
+    def __init__(self):
+        self.chromedriver_path = 'C:\\Users\\Shan\\Workspace2\\chromedriver.exe'
+        self.firefoxdriver_path = 'C:\\Users\\Shan\\Workspace2\\geckodriver.exe'
     
-    def Chrome_Web(self, driver_path):
+    def Launch_Web(self, driver_name):
         """File path should include `chromedriver.exe`"""
-        self.driver = webdriver.Chrome(service=Service(driver_path))
-        log(f'Launch Chrome_Web driver')
-        return self.driver
+        try:
+            if 'chrome' in driver_name.lower():
+                self.driver = webdriver.Chrome(service=Service(self.chromedriver_path), options=Options())
+                log(f'Launch <b style="color:blue">Chrome_Web</b> driver')
+            elif 'gecko' in driver_name.lower():
+                self.driver = webdriver.Firefox(service=Service(self.firefoxdriver_path), options=Options())
+                log(f'Launch <b style="color:blue">Firefox_Web</b> driver')
+            return self.driver
+        except SessionNotCreatedException as e:
+            log_color(e, 'red', level='ERROR')
+        except WebDriverException as e:
+            log_color(e, 'red', level='ERROR')
 
-    def Launch_WAP(self, driver_path):
-        import os
-        driver_name = os.path.basename(driver_path)
-        service = Service(driver_path)
-        option = Options()
-        if 'chrome' in driver_name.lower():
-            mobile_emulation = {"deviceName": "iPhone X"}
-            option.add_experimental_option("mobileEmulation", mobile_emulation)
-            self.driver = webdriver.Chrome(service=service, options=option)
-            log(f'Launch <b style="color:blue">Chrome_WAP</b> driver')
-        elif 'gecko' in driver_name.lower():
-            mobile_emulation = {"deviceName": "iPhone X"}
-            option.add_experimental_option("mobileEmulation", mobile_emulation)
-            self.driver = webdriver.Firefox(service=service, options=option)
-            log(f'Launch <b style="color:blue">Firefox_WAP</b> driver')
-        return self.driver
 
-    def Firefox_Web(self, path):
-        self.driver = webdriver.Firefox(service=Service(path))
-        log(f'Launch Firefox_Web driver')
-        return self.driver
+    def Launch_WAP(self, driver_name):
+        """Launch WAP"""
+        options = Options()
+        # options.add_argument("--headless")  
+        # options.add_argument("--disable-gpu")  
+        try:
+            if 'chrome' in driver_name.lower():
+                mobile_emulation = {"deviceName": "iPhone X"}
+                options.add_experimental_option("mobileEmulation", mobile_emulation)
+                self.driver = webdriver.Chrome(service=Service(self.chromedriver_path), options=options)
+                log(f'Launch <b style="color:blue">Chrome_WAP</b> driver')
+            elif 'gecko' in driver_name.lower():
+                mobile_emulation = {"deviceName": "iPhone X"}
+                options.add_experimental_option("mobileEmulation", mobile_emulation)
+                self.driver = webdriver.Firefox(service=Service(self.firefoxdriver_path), options=options)
+                log(f'Launch <b style="color:blue">Firefox_WAP</b> driver')
+            return self.driver
+        except SessionNotCreatedException as e:
+            log_color(e, 'red', level='ERROR')
+        except WebDriverException as e:
+            log_color(e, 'red', level='ERROR')
+
 
     def find_ID(self, value) -> WebElement:
         #AttributeError: 'NoneType' object has no attribute 'click' add -> -> WebElement and add return
-        log(f'Launch find_ID to find {value}', level='DEBUG')
-        return self.driver.find_element(By.ID, value=value)
-    
+        try:
+            log(f'Launch find_ID to find {value}', level='DEBUG')
+            return self.driver.find_element(By.ID, value=value)
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except ElementNotInteractableException as e:
+            log(f"Element is not interactable: {e}")
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except TimeoutException:
+            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")    
+
     def find_Name(self, value) -> WebElement:
-        log(f'Launch find_Name to find {value}', level='DEBUG')
-        return self.driver.find_element(By.NAME, value=value)
+        try:
+            log(f'Launch find_Name to find {value}', level='DEBUG')
+            return self.driver.find_element(By.NAME, value=value)
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except ElementNotInteractableException as e:
+            log(f"Element is not interactable: {e}")
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except TimeoutException:
+            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
     
     def find_xpath(self, value) -> WebElement:
         log(f'Launch find_xpath to find {value}', level='DEBUG')
@@ -68,12 +108,38 @@ class SeleniumBase():
         
     
     def find_IDs(self, value) -> WebElement:
-        log(f'Launch find_ID to find {value} list', level='DEBUG')
-        return self.driver.find_elements(By.ID, value=value)
+        try:
+            log(f'Launch find_ID to find {value} list', level='DEBUG')
+            return self.driver.find_elements(By.ID, value=value)
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except ElementNotInteractableException as e:
+            log(f"Element is not interactable: {e}")
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except TimeoutException:
+            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
     
     def find_Names(self, value) -> WebElement:
-        log(f'Launch find_Name to find {value} list', level='DEBUG')
-        return self.driver.find_elements(By.NAME, value=value)
+        try:
+            log(f'Launch find_Name to find {value} list', level='DEBUG')
+            return self.driver.find_elements(By.NAME, value=value)
+        except NoSuchElementException:
+            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except ElementNotInteractableException as e:
+            log(f"Element is not interactable: {e}")
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except TimeoutException:
+            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        except Exception as e:
+            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
 
     def find_xpaths(self, value) -> WebElement:
         log(f'Launch find_xpath to find {value} list', level='DEBUG')
@@ -97,7 +163,7 @@ class SeleniumBase():
         """return list with handles. Cooperate with `switch_window()`"""
         return self.driver.window_handles
     
-    def Click_it(self, method, value):
+    def Click(self, method, value):
         try:
             element = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((method, value)))
@@ -198,6 +264,10 @@ class SeleniumBase():
         self.driver.save_screenshot(f"{filename}")
         log_img(filename)
     
-    def Scroll_into_view_on_Base(self, locator):
+    def Scrolled_into_view(self, locator):
         self.Wait_until_element_is_displayed(By.XPATH, locator)
         self.find_xpath(locator).location_once_scrolled_into_view
+        log(f'Scroll into view {locator}')
+
+    def Close_browsers(self):
+        self.driver.close()

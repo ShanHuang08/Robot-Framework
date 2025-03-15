@@ -1,28 +1,28 @@
 from SeleniumLibrary import SeleniumLibrary
-from Library.Robot_definition import log, log_color, run
+from Robot_definition import log, log_color, run
+from SeleniumBase import SeleniumBase
 from selenium.common.exceptions import TimeoutException, ElementNotInteractableException, SessionNotCreatedException, WebDriverException
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver import ChromeOptions
-import os
 from time import sleep
 
 class SeleniumLibBase():
     def __init__(self):
         self.se_lib = SeleniumLibrary()
+        self.chromedriver_path = 'C:\\Users\\Shan\\Workspace2\\chromedriver.exe'
+        self.firefoxdriver_path = 'C:\\Users\\Shan\\Workspace2\\geckodriver.exe'
     
-    def Open_Browser_in_Mobile_View(self, url, driver_path):
-        """Needs `url` and `Driver path`"""
+    def Open_Browser_in_Mobile_View(self, url, driver_name):
+        """Needs `url` and `Driver name` : 'chrome' or 'firefox'"""
         try:
-            driver_name = os.path.basename(driver_path)
-            
             if 'chrome' in driver_name.lower():
                 log('Launch <b style="color: blue">Chrome</b> browser')
-                self.se_lib.open_browser(url, 'chrome', options=ChromeOptions(), service=ChromeService(driver_path))
-            elif 'gecko' in driver_name.lower():
+                self.se_lib.open_browser(url, 'chrome', options=ChromeOptions(), service=ChromeService(self.chromedriver_path))
+            elif 'firefox' in driver_name.lower():
                 log('Launch <b style="color: blue">Firefox</b> browser')
-                self.se_lib.open_browser(url, 'firefox', executable_path=driver_path)
+                self.se_lib.open_browser(url, 'firefox', executable_path=self.firefoxdriver_path)
             else: 
-                raise ValueError(f"Invalid driver name: {driver_name} ((e.g., chromedriver or geckodriver))")
+                raise ValueError(f"Invalid driver name: {driver_name}")
             
             self.se_lib.set_window_size(width=414, height=996)
             self.se_lib.execute_javascript('window.navigator.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2 like Mac OS X) \
@@ -77,4 +77,5 @@ class SeleniumLibBase():
     
     def Close_down_all_browsers(self):
         self.se_lib.close_all_browsers()
+        SeleniumBase().Close_browsers()
   
