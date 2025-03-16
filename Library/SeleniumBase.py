@@ -21,7 +21,7 @@ class SeleniumBase():
             if 'chrome' in driver_name.lower():
                 self.driver = webdriver.Chrome(service=Service(self.chromedriver_path), options=Options())
                 log(f'Launch <b style="color:blue">Chrome_Web</b> driver')
-            elif 'gecko' in driver_name.lower():
+            elif 'firefox' in driver_name.lower():
                 self.driver = webdriver.Firefox(service=Service(self.firefoxdriver_path), options=Options())
                 log(f'Launch <b style="color:blue">Firefox_Web</b> driver')
             return self.driver
@@ -42,7 +42,7 @@ class SeleniumBase():
                 options.add_experimental_option("mobileEmulation", mobile_emulation)
                 self.driver = webdriver.Chrome(service=Service(self.chromedriver_path), options=options)
                 log(f'Launch <b style="color:blue">Chrome_WAP</b> driver')
-            elif 'gecko' in driver_name.lower():
+            elif 'firefox' in driver_name.lower():
                 mobile_emulation = {"deviceName": "iPhone X"}
                 options.add_experimental_option("mobileEmulation", mobile_emulation)
                 self.driver = webdriver.Firefox(service=Service(self.firefoxdriver_path), options=options)
@@ -163,7 +163,8 @@ class SeleniumBase():
         """return list with handles. Cooperate with `switch_window()`"""
         return self.driver.window_handles
     
-    def Click(self, method, value):
+    def Click(self, method=By.XPATH, value=''):
+        """`method` default value is XPATH"""
         try:
             element = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((method, value)))
@@ -174,13 +175,14 @@ class SeleniumBase():
             fail(f"Element is not interactable: {e}")
         except TimeoutException:
             run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-            fail(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+            fail(f"Element {value} was not clickable after 10 secs.")
         except Exception as e:
             run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-            fail(f"An unexpected error occurred: {e}", 'red', level='ERROR')
+            fail(f"An unexpected error occurred: {e}")
 
 
-    def Wait_until_element_is_displayed(self, method, value, wait_secs=10):
+    def Wait_until_element_is_displayed(self, method=By.XPATH, value='', wait_secs=10):
+        """`method` default value is XPATH"""
         try:
             element = WebDriverWait(self.driver, wait_secs).until(
                 EC.visibility_of_element_located((method, value)))
@@ -200,7 +202,8 @@ class SeleniumBase():
             return None
     
 
-    def Wait_until_element_is_enabled(self, method, value, wait_secs=10):
+    def Wait_until_element_is_enabled(self, method=By.XPATH, value='', wait_secs=10):
+        """`method` default value is XPATH"""
         try:
             element = WebDriverWait(self.driver, wait_secs).until(
                 EC.element_to_be_clickable((method, value)))
@@ -220,7 +223,8 @@ class SeleniumBase():
             return None
 
 
-    def Wait_until_page_Contain_element(self, method, value, wait_secs=10):
+    def Wait_until_page_Contain_element(self, method=By.XPATH, value='', wait_secs=10):
+        """`method` default value is XPATH"""
         try:
             element = WebDriverWait(self.driver, wait_secs).until(
                 EC.presence_of_element_located((method, value)))
@@ -240,7 +244,8 @@ class SeleniumBase():
             return None
     
 
-    def Wait_until_element_is_selected(self, method, value, wait_secs=10):
+    def Wait_until_element_is_selected(self, method=By.XPATH, value='', wait_secs=10):
+        """`method` default value is XPATH"""
         try:
             element = WebDriverWait(self.driver, wait_secs).until(
                 EC.element_located_to_be_selected((method, value)))
@@ -265,9 +270,9 @@ class SeleniumBase():
         log_img(filename)
     
     def Scrolled_into_view(self, locator):
-        self.Wait_until_element_is_displayed(By.XPATH, locator)
+        self.Wait_until_element_is_displayed(value=locator)
         self.find_xpath(locator).location_once_scrolled_into_view
-        log(f'Scroll into view {locator}')
+        log(f'Scroll into {locator}')
 
     def Close_browsers(self):
         self.driver.close()

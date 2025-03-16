@@ -10,6 +10,7 @@ from SeleniumLibrary import SeleniumLibrary
 
 class Cathay(SeleniumLibBase, SeleniumBase):
     def __init__(self):
+        super().__init__()  # Make sure  SeleniumBase.__init__() can be executed
         self.url = "https://www.cathaybk.com.tw/cathaybk/"
         self.se_lib = SeleniumLibrary()
         self.timeout = 10
@@ -22,35 +23,35 @@ class Cathay(SeleniumLibBase, SeleniumBase):
         # 1. 使用Chrome App到國泰世華銀行官網(https://www.cathaybk.com.tw/cathaybk/)並將畫面截圖。
         log(f'Access to <a href="{self.url}" target="_blank">{self.url}</a>')
         self.driver.get(self.url)
-        self.Wait_until_element_is_displayed(By.XPATH, '/html')
+        self.Wait_until_element_is_displayed(value='/html')
         run('Save_Screenshot', 'App main page.png')
         # 2. 點選左上角選單，進入 個人金融 > 產品介紹 > 信用卡列表，需計算有幾個項目在信用卡選單下面，並將畫面截圖。
-        self.Click(By.XPATH, Cathay_Xpath['Menu'])
-        self.Click(By.XPATH, Cathay_Xpath['產品介紹'])
-        self.Click(By.XPATH, Cathay_Xpath['信用卡'])
+        self.Click(value=Cathay_Xpath['Menu'])
+        self.Click(value=Cathay_Xpath['產品介紹'])
+        self.Click(value=Cathay_Xpath['信用卡'])
 
-        self.Wait_until_page_Contain_element(By.XPATH, '//div[contains(@class, "is-L2open")]')
-        self.Wait_until_element_is_displayed(By.XPATH, Cathay_Xpath['掛失信用卡'])
+        self.Wait_until_page_Contain_element(value='//div[contains(@class, "is-L2open")]')
+        self.Wait_until_element_is_displayed(value=Cathay_Xpath['掛失信用卡'])
         
-        card_services = self.find_xpaths(Cathay_Xpath['Card Service list'])
+        card_services = self.find_xpaths(value=Cathay_Xpath['Card Service list'])
         if card_services:
             log(f"{len(card_services)} items are in the card services")
             for service in card_services:
                 log(service.text)
         run('Save_Screenshot', 'credit card services list.png')
         # 3-1. 個人金融 > 產品介紹 > 信用卡 > 卡片介紹 > 計算頁面上所有(停發)信用卡數量
-        self.Click(By.XPATH, Cathay_Xpath['卡片介紹'])
+        self.Click(value=Cathay_Xpath['卡片介紹'])
         
         attr = self.Check_BlockName('停發卡', 'Base')
 
-        self.Wait_until_page_Contain_element(By.XPATH, f'//section[@data-anchor-block="{attr}"]//div[@class="cubre-m-compareCard__title"]')
+        self.Wait_until_page_Contain_element(value=f'//section[@data-anchor-block="{attr}"]//div[@class="cubre-m-compareCard__title"]')
 
 
         card_list = self.find_xpaths(f'//section[@data-anchor-block="{attr}"]//div[@class="cubre-m-compareCard__title"]')
         if card_list: log(f'所有停發信用卡有{len(card_list)}張')
 
-        self.Wait_until_page_Contain_element(By.XPATH, f'//section[@data-anchor-block="{attr}"]//img')
-        card_pics = self.find_xpaths(f'//section[@data-anchor-block="{attr}"]//img')
+        self.Wait_until_page_Contain_element(value=f'//section[@data-anchor-block="{attr}"]//img')
+        card_pics = self.find_xpaths(value=f'//section[@data-anchor-block="{attr}"]//img')
         card_links = []
         if card_pics:
             for pic in card_pics:
@@ -65,7 +66,7 @@ class Cathay(SeleniumLibBase, SeleniumBase):
         if len(card_list) == len(span_list):
             log_color('Card titles match with Span buttons', 'blue')
         else:
-            fail('Card titles does not match with Span buttons', 'red')
+            fail('Card titles does not match with Span buttons')
 
         Total_screenshots = self.Get_screenshot_of_cards(span_list, attr)
         # 比對截圖數量跟信用卡數量
@@ -141,7 +142,6 @@ class Cathay(SeleniumLibBase, SeleniumBase):
             Ob_Tabs = self.se_lib.find_elements('xpath:'+Cathay_Xpath['卡片介紹Tabs'])
         elif source == 'Base':
             Ob_Tabs = self.find_xpaths(Cathay_Xpath['卡片介紹Tabs'])
-            log(Ob_Tabs)
         else:
             raise ValueError('Source param is incorrect!')
 
@@ -177,10 +177,10 @@ class Cathay(SeleniumLibBase, SeleniumBase):
     def Get_screenshot_of_cards(self, span_list, attr):
         # Scroll into view
         self.Scrolled_into_view(f'//section[@data-anchor-block="{attr}"]')
-        self.Wait_until_page_Contain_element(By.XPATH, Cathay_Xpath['停發卡Tab_active'])
+        self.Wait_until_page_Contain_element(value=Cathay_Xpath['停發卡Tab_active'])
         num = 0
         for i in range(1, len(span_list)+1):
-            self.Click(By.XPATH, f'//section[@data-anchor-block="{attr}"]//span[@aria-label="Go to slide {str(i)}"]')
+            self.Click(value=f'//section[@data-anchor-block="{attr}"]//span[@aria-label="Go to slide {str(i)}"]')
             sleep(2)
             run('Save_Screenshot', f'obsoleted_card{str(i)}.png')
             num = i
