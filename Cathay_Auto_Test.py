@@ -16,8 +16,6 @@ class Cathay(SeleniumLibBase, SeleniumBase):
         self.timeout = 10
 
     def Scrap_Cathay(self):
-        # options.add_argument("--headless")  
-        # options.add_argument("--disable-gpu")  
         self.driver = self.Launch_WAP('chrome')
 
         # 1. 使用Chrome App到國泰世華銀行官網(https://www.cathaybk.com.tw/cathaybk/)並將畫面截圖。

@@ -270,9 +270,10 @@ class SeleniumBase():
         log_img(filename)
     
     def Scrolled_into_view(self, locator):
+        """Scroll into view for whole body"""
         self.Wait_until_element_is_displayed(value=locator)
         self.find_xpath(locator).location_once_scrolled_into_view
         log(f'Scroll into {locator}')
 
     def Close_browsers(self):
-        self.driver.close()
+        self.driver.quit()
