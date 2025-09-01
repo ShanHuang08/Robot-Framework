@@ -21,17 +21,17 @@ class Cathay(SeleniumLibBase, SeleniumBase):
         # 1. 使用Chrome App到國泰世華銀行官網(https://www.cathaybk.com.tw/cathaybk/)並將畫面截圖。
         log(f'Access to <a href="{self.url}" target="_blank">{self.url}</a>')
         self.driver.get(self.url)
-        self.Wait_until_element_is_displayed(value='/html')
+        self.Wait_until_element_is_displayed('/html')
         run('Save_Screenshot', 'App main page.png')
         # 2. 點選左上角選單，進入 個人金融 > 產品介紹 > 信用卡列表，需計算有幾個項目在信用卡選單下面，並將畫面截圖。
         self.Click(value=Cathay_Xpath['Menu'])
         self.Click(value=Cathay_Xpath['產品介紹'])
         self.Click(value=Cathay_Xpath['信用卡'])
 
-        self.Wait_until_page_Contain_element(value='//div[contains(@class, "is-L2open")]')
-        self.Wait_until_element_is_displayed(value=Cathay_Xpath['掛失信用卡'])
+        self.Wait_until_page_Contain_element('//div[contains(@class, "is-L2open")]')
+        self.Wait_until_element_is_displayed(Cathay_Xpath['掛失信用卡'])
         
-        card_services = self.find_xpaths(value=Cathay_Xpath['Card Service list'])
+        card_services = self.find_xpaths(Cathay_Xpath['Card Service list'])
         if card_services:
             log(f"{len(card_services)} items are in the card services")
             for service in card_services:
@@ -42,14 +42,14 @@ class Cathay(SeleniumLibBase, SeleniumBase):
         
         attr = self.Check_BlockName('停發卡', 'Base')
 
-        self.Wait_until_page_Contain_element(value=f'//section[@data-anchor-block="{attr}"]//div[@class="cubre-m-compareCard__title"]')
+        self.Wait_until_page_Contain_element(f'//section[@data-anchor-block="{attr}"]//div[@class="cubre-m-compareCard__title"]')
 
 
         card_list = self.find_xpaths(f'//section[@data-anchor-block="{attr}"]//div[@class="cubre-m-compareCard__title"]')
         if card_list: log(f'所有停發信用卡有{len(card_list)}張')
 
-        self.Wait_until_page_Contain_element(value=f'//section[@data-anchor-block="{attr}"]//img')
-        card_pics = self.find_xpaths(value=f'//section[@data-anchor-block="{attr}"]//img')
+        self.Wait_until_page_Contain_element(f'//section[@data-anchor-block="{attr}"]//img')
+        card_pics = self.find_xpaths(f'//section[@data-anchor-block="{attr}"]//img')
         card_links = []
         if card_pics:
             for pic in card_pics:
@@ -193,7 +193,7 @@ class Cathay(SeleniumLibBase, SeleniumBase):
 
 
 
-use_globals_update_keywords(Cathay(), globals())
+use_globals_update_keywords(globals(), Cathay())
 
 # TQA測試: 程式邏輯題目
 def question1(input_list:list):

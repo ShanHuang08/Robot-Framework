@@ -112,39 +112,39 @@ def make_get_request(uri, ip, user="", pw="", exp_code=None):
                 user, pw, exp_code, resp.status_code, resp.text))
     return resp
 
-def use_globals_update_keywords(put_class, local_globals):
+def use_globals_update_keywords(local_globals, *put_class):
     """ 
-    - `put_class`: Input defined class
     - `local_globals`: Input `globals()` funtion directly.
+    - `put_class`: Input defined classes
 
      `globals()` only gets global functions on local file, it must be delivered as attribute if `globals_update_keywords()` is defined on other python file.
     """
-    return local_globals.update({name: getattr(put_class, name) for name in dir(put_class) if not name.startswith('__')})
+    for cla in put_class:
+        return local_globals.update({name: getattr(cla, name) for name in dir(cla) if not name.startswith('__')})
 
 
-def use_globals_update_keywords_break_down(put_class, local_globals):
+def use_globals_update_keywords_break_down(local_globals, *put_class):
     """ 
-    - `put_class`: Input defined class
     - `target_globals`: Input `globals()` funtion directly.
+    - `put_class`: Input defined classes
 
      `globals()` only gets global functions on local file, it must be delivered as attribute if `globals_update_keywords()` is defined on other python file.
     """
     # local_globals is globals() function from local python file as arg
-    from pprint import pprint
     keys = []
     values = []
     # print(dir(my_words)) # return all methods defined in class as list type
-    for name in dir(put_class):
-        if not name.startswith('__'): # Exclude special methods and attributes (those that start with '__').
-            # print(name) # name is all methods defined in class as str, will be a key in dictionary.
-            keys.append(name)
-            # print(getattr(my_words, name)) # getattr() return attrube of each methods in class, will be a value in dictionary.
-            values.append(getattr(put_class, name))
+    for cla in put_class:
+        for name in dir(cla):
+            if not name.startswith('__'): # Exclude special methods and attributes (those that start with '__').
+                # print(name) # name is all methods defined in class as str, will be a key in dictionary.
+                keys.append(name)
+                # print(getattr(my_words, name)) # getattr() return attrube of each methods in class, will be a value in dictionary.
+                values.append(getattr(cla, name))
 
     # dict_to_globals_update = {keys[i]:values[i] for i in range(len(keys))} # Put keys and values to the dictionary
     dict_to_globals_update = {k:v for k, v in zip(keys, values)}
     # dict_to_globals_update = dict(zip(keys, values)) # Put keys and values to the dictionary
-    # pprint(dict_to_globe_update)
     return local_globals.update(dict_to_globals_update)
 
 

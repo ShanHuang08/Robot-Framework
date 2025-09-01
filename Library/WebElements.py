@@ -11,7 +11,6 @@ Cathay_Xpath = {
     '停發卡Tab_active' : '//div[@class="cubre-m-anchor__fixBox"]//a[contains(@class, "is-active")]'
     }
 
-
 Twitch_Xpath = {
     'Click Browse' : '//a[@href="/directory"]//div[contains(text(), "瀏覽")]',
     'Search input field' : '//header[@id="twilight-sticky-header-root"]//input[@placeholder="搜尋"]',

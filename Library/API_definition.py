@@ -1,7 +1,9 @@
 import requests
 import urllib3
-from Library.Robot_definition import log
+from Library.Robot_definition import log, log_color
 urllib3.disable_warnings()
+from time import perf_counter, sleep
+import httpx
 
 class API_Methods():
     def GET_Request(self, url, params=None, auth=None, timeout=20, retries=3, exp_code=None):
@@ -10,7 +12,11 @@ class API_Methods():
         """
         try:
             Get_data = requests.get(url=url, params=params, auth=auth, verify=False, timeout=timeout)
-            log(f"making GET request {url}, params is {params} and expeted return {exp_code}")
+            if params:
+                log(f"making GET request to {url}, params is {params} and expeted return {exp_code}")
+            else:
+                log(f"making GET request to {url} and expeted return {exp_code}")
+            return Get_data
         except requests.exceptions.ConnectTimeout as e:
             log(f'ConnectTimeout: {e}')
             self.Retry_api(url, auth, retries)
@@ -23,11 +29,8 @@ class API_Methods():
             raise Exception(f'ConnectionError: {e}')
         except urllib3.exceptions.ReadTimeoutError as e:
             raise Exception(f'ReadTimeoutError: {e}')
+
         
-        else:
-            if exp_code and (Get_data.status_code != int(exp_code)):
-                raise Exception(f"Status code should be {exp_code} but it is {Get_data.status_code}\nResponse body:")
-        return Get_data
 
     def PATCH_Request(self, url, auth, body, params=None,  timeout=10, exp_code=None):
         """
@@ -35,8 +38,11 @@ class API_Methods():
         """
         try:
             Patch_data = requests.patch(url=url, params=params, auth=auth, json=body, verify=False, timeout=timeout)
-            log(f"making PATCH request {url} withp params {params} and body {body} and expeted return {exp_code}")
-            
+            if params:
+                log(f"making PATCH request to {url} with params {params} and body {body} and expeted return {exp_code}")
+            else:
+                log(f"making PATCH request to {url} and body {body} and expeted return {exp_code}")
+            return Patch_data
         except requests.exceptions.HTTPError as e:
             raise Exception(f'HTTPError: {e}')
         except requests.exceptions.ConnectTimeout as e:
@@ -45,10 +51,8 @@ class API_Methods():
             raise Exception(f'ConnectionError: {e}')
         except requests.exceptions.Timeout as e:
             raise Exception(f'Timeout: {e}')
-        else:
-            if exp_code and (Patch_data.status_code != int(exp_code)):
-                raise Exception(f"Status code should be {exp_code} but it is {Patch_data.status_code}\nResponse body:")
-        return Patch_data
+
+        
 
 
     def POST_Request(self, url, auth, body, params=None,  timeout=10, exp_code=None):
@@ -57,8 +61,11 @@ class API_Methods():
         """
         try:
             Post_data = requests.post(url=url, params=params, auth=auth, json=body, verify=False, timeout=timeout)
-            log(f"making POST request {url} withp params {params} and body {body} and expeted return {exp_code}")
-            
+            if params:
+                log(f"making POST request to {url} with params {params} and body {body} and expeted return {exp_code}")
+            else:
+                log(f"making POST request to {url} and body {body} and expeted return {exp_code}")
+            return Post_data
         except requests.exceptions.HTTPError as e:
             raise Exception(f'HTTPError: {e}')
         except requests.exceptions.ConnectTimeout as e:
@@ -67,18 +74,38 @@ class API_Methods():
             raise Exception(f'ConnectionError: {e}')
         except requests.exceptions.Timeout as e:
             raise Exception(f'Timeout: {e}')
-        else:
-            if exp_code and (Post_data.status_code != int(exp_code)):
-                raise Exception(f"Status code should be {exp_code} but it is {Post_data.status_code}\nResponse body:")
-        return Post_data
 
-    def DELETE_Request(self, url, auth, params=None,  exp_code=None):
+
+    def PUT_Request(self, url, auth, body, params=None,  timeout=10, exp_code=None):
+        """
+        `params=None`, Timeout `10 secs`, Default body = `None` `json=body`
+        """
+        try:
+            Put_data = requests.put(url=url, params=params, auth=auth, json=body, verify=False, timeout=timeout)
+            if params:
+                log(f"making PUT request to {url} with params {params} and body {body} and expeted return {exp_code}")
+            else:
+                log(f"making PUT request to {url} and body {body} and expeted return {exp_code}")
+            return Put_data
+        except requests.exceptions.HTTPError as e:
+            raise Exception(f'HTTPError: {e}')
+        except requests.exceptions.ConnectTimeout as e:
+            raise Exception(f'ConnectTimeout: {e}')
+        except requests.exceptions.ConnectionError as e:
+            raise Exception(f'ConnectionError: {e}')
+        except requests.exceptions.Timeout as e:
+            raise Exception(f'Timeout: {e}')
+
+        
+
+    def DELETE_Request(self, url, auth,  exp_code=None):
         """
         `params=None`, Timeout `10 secs`
         """
         try:
-            Delete_data = requests.delete(url=url, params=params, auth=auth, verify=False, timeout=10, exp_code=None)
-            log(f"making DELETE request {url}, params is {params} and expeted return {exp_code}")
+            Delete_data = requests.delete(url=url, auth=auth, verify=False, timeout=10)
+            log(f"making DELETE request to {url} and expeted return {exp_code}")
+            return Delete_data
         except requests.exceptions.HTTPError as e:
             raise Exception(f'HTTPError: {e}')
         except requests.exceptions.ConnectTimeout as e:
@@ -87,10 +114,17 @@ class API_Methods():
             raise Exception(f'ConnectionError: {e}')
         except requests.exceptions.Timeout as e:
             raise Exception(f'Timeout: {e}')
-        else:
-            if exp_code and (Delete_data.status_code != int(exp_code)):
-                raise Exception(f"Status code should be {exp_code} but it is {Delete_data.status_code}\nResponse body:")
-        return Delete_data
+
+
+
+    def Check_if_status_code_match(self, actual:int, expect:int):
+        """- Actual: `res.status_code`
+           - Expect: `exp_status`
+        """
+        if actual != expect:
+            log_color(f"Status code should be {expect} but it is {actual}", "red")
+        else: log(f"Status code is expected: {actual}")
+        return actual == expect
 
 
     def Retry_api(self, url, auth, retries:int):
@@ -128,3 +162,34 @@ class API_Methods():
         if not success: 
             fail_list_str = '\n'.join(Fail_List)
             raise Exception(f"Retry api failed after {retries} times\n{fail_list_str}")
+
+
+    def GET_Avg_Res_Time(self, url, count:int):
+        """Utilize `httpx` to Calculate average api response time by count"""
+        import asyncio
+        Total_time = 0
+        async def get_res_time():
+            Total = 0
+            async with httpx.AsyncClient(http2=True) as client:
+                for _ in range(count):
+                    start_time = perf_counter() * 1000
+                    await client.get(url)
+                    end_time = perf_counter() * 1000
+                    elapsed_time = end_time - start_time - self.measure_overhead()
+                    log(f"GET {url} url execution time = {"{:.4f}".format(elapsed_time)} ms")
+                    Total+=(elapsed_time)
+                return Total
+        log(f"<b>===== Check Average Response Time for {count} times =====</b>")
+        try:
+            Total_time = asyncio.run(get_res_time()) 
+        except Exception as e:
+            log(f"Connection Error: {e}")
+        log(f"<b>===== Check Average Response Time for {count} times =====</b>")
+        return Total_time/count
+
+    def measure_overhead(self):
+        """Count the time of overhead"""
+        start_time = perf_counter() * 1000
+        end_time = perf_counter() * 1000
+        overhead = end_time - start_time
+        return overhead

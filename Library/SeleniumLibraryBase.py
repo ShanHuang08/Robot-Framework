@@ -5,12 +5,13 @@ from selenium.common.exceptions import TimeoutException, ElementNotInteractableE
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver import ChromeOptions
 from time import sleep
+from test_config import browser
 
 class SeleniumLibBase():
     def __init__(self):
         self.se_lib = SeleniumLibrary()
-        self.chromedriver_path = 'C:\\Users\\Shan\\Workspace2\\chromedriver.exe'
-        self.firefoxdriver_path = 'C:\\Users\\Shan\\Workspace2\\geckodriver.exe'
+        self.chromedriver_path = browser['chrome']
+        self.firefoxdriver_path = browser['firefox']
     
     def Open_Browser_in_Mobile_View(self, url, driver_name):
         """Needs `url` and `Driver name` : 'chrome' or 'firefox'"""

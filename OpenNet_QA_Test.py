@@ -332,4 +332,4 @@ class Twitch_test(SeleniumLibBase):
         else: log_color('Test PASS', color='blue')
 
 
-use_globals_update_keywords(Twitch_test(), globals())
+use_globals_update_keywords(globals(), Twitch_test())
