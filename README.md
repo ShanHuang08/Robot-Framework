@@ -1,6 +1,6 @@
 ## My Robot Test Report
 
-#### Test report link: [My latest Robot report]([https://drive.google.com/file/d/1xgJCh-D8R-Z_lw0Ggqwsd2ufR3ZJcatk/view?usp=drive_link](https://drive.google.com/file/d/1ch88Y33iwIOyJCseY3Fov9lFgdqwvVLd/view?usp=drive_link))
+#### Test report link: [My latest Robot report]([https://drive.google.com/file/d/1xgJCh-D8R-Z_lw0Ggqwsd2ufR3ZJcatk/view?usp=drive_link](https://drive.google.com/file/d/1ch88Y33iwIOyJCseY3Fov9lFgdqwvVLd/view?usp=drive_link)
 
 ## Test cases detail
 
