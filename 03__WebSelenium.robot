@@ -1,5 +1,6 @@
 *** Settings ***
 Library    Cathay_Auto_Test.py
+Library    Axiom_Auto_Test.py
 
 *** Test Cases ***
 Cathay Auto Test
@@ -11,3 +12,8 @@ Use Robot Keyword to run Cathay Auto Test
     [Tags]    SeleniumLibrary
     Robot_Keyword_Scrap_Cathay
     [Teardown]    Close_Browser    Robot
+
+Axiom_Auto_Test
+    [Tags]    Swag
+    Swag_Labs_Web_Scrape    2
+    [Teardown]    Close_Browser    Base

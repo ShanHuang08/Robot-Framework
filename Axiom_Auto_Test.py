@@ -2,7 +2,6 @@ from Library.API_definition import API_Methods
 from Library.Robot_definition import log, log_color, fail, use_globals_update_keywords, run
 from Library.SeleniumBase import SeleniumBase
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 import json
 from time import time, perf_counter, sleep
 from random import sample, choice
@@ -21,33 +20,24 @@ class Axiom_Auto_Test(API_Methods, SeleniumBase):
         self.se_url = "https://www.saucedemo.com/"
         self._account = "standard_user"
         self._password = "secret_sauce"
+        # 'Save_Screenshot' = 'Axiom_Auto_Test.Save Screenshot'  # Cannot find keyword
 
     # API自動化測試
     def GET_Pokemon_Api_response(self, id_name=None, exp_code=304):
         """GET https://pokeapi.co/api/v2/pokemon/{id or name} api and check `JSON` response"""
-        err = []
-        test_case_start = time()
         self.api_url += str(id_name)
+        test_case_start = time()
 
         res = self.GET_Request(self.api_url, exp_code=exp_code)
-
-        if not self.Check_if_status_code_match(res.status_code, exp_code):
-            err.append(f'Check status code failed! {res.status_code} != {exp_code}')
-
-        if not self.Check_JSON_response(res.json(), self.exp_keys, self.exp_value):
-            err.append('Response check failed!')
-        
-        Avg_res_Time = self.GET_Avg_Res_Time(self.api_url, 10)
-
-        if Avg_res_Time > 500: 
-            log_color(f'Average api response time is {"{:.4f}".format(Avg_res_Time)} ms, greater than 500 ms", "red')
-            err.append(f"Average api response time is {Avg_res_Time} ms, greater than 500 ms")
-        else:
-            log(f'Average api response time is {"{:.4f}".format(Avg_res_Time)} ms')
+        Check_status_code = self.Check_if_status_code_match(res.status_code, exp_code)
+        Check_res = self.Check_JSON_response(res.json(), self.exp_keys, self.exp_value)      
+        Avg_time = self.GET_Avg_Res_Time(self.api_url, 10)
+        self.Final_Test_result(Check_status_code, Check_res, Avg_time)
 
         test_case_end = time()
         log(f'Test case executiion time: <b>{"{:.4f}".format(test_case_end - test_case_start)} secs</b>')
-        self.Final_Test_result(err)
+
+
 
 
     def GET_Pokemon_Api_with_various_methods(self):
@@ -108,7 +98,12 @@ class Axiom_Auto_Test(API_Methods, SeleniumBase):
 
             log("<b>===== Response =====</b>")
             log(check, level='DEBUG')
-            return True if len(check) >= len(exp_keys) else False
+            if len(check) <= len(exp_keys):
+                log_color("Response check failed!", "red")
+                return False
+            else:
+                log_color("Response check pass!", "blue")
+                return True
         except json.decoder.JSONDecodeError as e:
             log_color(f"{e}\nCheck response format failed! {res}", level="ERROR")
 
@@ -128,14 +123,10 @@ class Axiom_Auto_Test(API_Methods, SeleniumBase):
         log(f"<b>===== Check Average Response Time for {count} times =====</b>")
         return Total_time/count
 
-    def Final_Test_result(self, err:list):
-        if err:
-            err_msg = '\n'.join(msg for msg in err)
-            log_color('Test FAIL', color='red')
-            fail(f'Error: {err_msg}')
+    def Final_Test_result(self, *results):
+        if False in results: fail('Test FAIL', color='red')
         else: log_color('Test PASS', color='blue')
 
-    
     # Websocket自動化測試
     # wss://echo.websocket.org/
     async def Websocket_Test(self):

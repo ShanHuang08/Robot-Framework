@@ -51,109 +51,51 @@ class SeleniumBase():
             log_color(e, 'red', level='ERROR')
 
 
-    def find_ID(self, value) -> WebElement:
-        #AttributeError: 'NoneType' object has no attribute 'click' add -> -> WebElement and add return
+    def _find_element(self, by, value, multiple=False):
+        """通用元素查找方法，統一異常處理邏輯
+        
+        `multiple=True` 時回傳元素列表，否則回传单個元素。
+        """
+        label = f"{by}:{value}" + (" list" if multiple else "")
+        log(f'Launch _find_element to find {label}', level='DEBUG')
         try:
-            log(f'Launch find_ID to find {value}', level='DEBUG')
-            return self.driver.find_element(By.ID, value=value)
+            if multiple:
+                return self.driver.find_elements(by, value)
+            else:
+                return self.driver.find_element(by, value)
         except NoSuchElementException:
-            log_color(f"Element {value} was not found.", 'red', level='ERROR')
+            # 元素在 DOM 中完全不存在，通常是定位器寫錯或頁面還沒載入該元素
+            log_color(f"Element {label} was not found.", 'red', level='ERROR')
             run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
         except ElementNotInteractableException as e:
+            # 元素存在於 DOM 但無法互動，例如：被遮擋、display:none、disabled、或元素尚未可見
             log(f"Element is not interactable: {e}")
             run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
         except TimeoutException:
-            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
+            # WebDriverWait 等待超時，元素在指定時間內仍未達到預期狀態（如不可見、不可點擊）
+            log_color(f"Element {label} was not clickable after 10 secs.", 'red', level='ERROR')
             run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
         except Exception as e:
             log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")    
+            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+
+    def find_ID(self, value) -> WebElement:
+        return self._find_element(By.ID, value)
 
     def find_Name(self, value) -> WebElement:
-        try:
-            log(f'Launch find_Name to find {value}', level='DEBUG')
-            return self.driver.find_element(By.NAME, value=value)
-        except NoSuchElementException:
-            log_color(f"Element {value} was not found.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except ElementNotInteractableException as e:
-            log(f"Element is not interactable: {e}")
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except TimeoutException:
-            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except Exception as e:
-            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-    
-    def find_xpath(self, value) -> WebElement:
-        log(f'Launch find_xpath to find {value}', level='DEBUG')
-        try:
-            return self.driver.find_element(By.XPATH, value=value)
-        except NoSuchElementException:
-            log_color(f"Element {value} was not found.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except ElementNotInteractableException as e:
-            log(f"Element is not interactable: {e}")
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except TimeoutException:
-            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except Exception as e:
-            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        
-    
-    def find_IDs(self, value) -> WebElement:
-        try:
-            log(f'Launch find_ID to find {value} list', level='DEBUG')
-            return self.driver.find_elements(By.ID, value=value)
-        except NoSuchElementException:
-            log_color(f"Element {value} was not found.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except ElementNotInteractableException as e:
-            log(f"Element is not interactable: {e}")
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except TimeoutException:
-            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except Exception as e:
-            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-    
-    def find_Names(self, value) -> WebElement:
-        try:
-            log(f'Launch find_Name to find {value} list', level='DEBUG')
-            return self.driver.find_elements(By.NAME, value=value)
-        except NoSuchElementException:
-            log_color(f"Element {value} was not found.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except ElementNotInteractableException as e:
-            log(f"Element is not interactable: {e}")
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except TimeoutException:
-            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except Exception as e:
-            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+        return self._find_element(By.NAME, value)
 
-    def find_xpaths(self, value) -> WebElement:
-        log(f'Launch find_xpath to find {value} list', level='DEBUG')
-        try:
-            return self.driver.find_elements(By.XPATH, value=value)
-        except NoSuchElementException:
-            log_color(f"Element {value} was not found.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except ElementNotInteractableException as e:
-            log(f"Element is not interactable: {e}")
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except TimeoutException:
-            log_color(f"Element {value} was not clickable after 10 secs.", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
-        except Exception as e:
-            log_color(f"An unexpected error occurred: {e}", 'red', level='ERROR')
-            run('Save_Screenshot', f"Fail_screenshot_{int(time())}.png")
+    def find_xpath(self, value) -> WebElement:
+        return self._find_element(By.XPATH, value)
+
+    def find_IDs(self, value) -> list[WebElement]:
+        return self._find_element(By.ID, value, multiple=True)
+
+    def find_Names(self, value) -> list[WebElement]:
+        return self._find_element(By.NAME, value, multiple=True)
+
+    def find_xpaths(self, value) -> list[WebElement]:
+        return self._find_element(By.XPATH, value, multiple=True)
         
 
     def get_window_handles(self):

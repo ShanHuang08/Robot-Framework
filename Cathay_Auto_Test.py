@@ -14,6 +14,7 @@ class Cathay(SeleniumLibBase, SeleniumBase):
         self.url = "https://www.cathaybk.com.tw/cathaybk/"
         self.se_lib = SeleniumLibrary()
         self.timeout = 10
+        # 'Save_Screenshot' = 'Cathay.Save Screenshot'  # Cannot find keyword
 
     def Scrap_Cathay(self):
         self.driver = self.Launch_WAP('chrome')
@@ -196,34 +197,26 @@ class Cathay(SeleniumLibBase, SeleniumBase):
 use_globals_update_keywords(globals(), Cathay())
 
 # TQA測試: 程式邏輯題目
-def question1(input_list:list):
+def question1(input_list: list):
     """
     - Input: [35, 46, 57, 91, 29]
     - Output: [53, 64, 75, 19, 92]
     """
-    def reverse_double_digit(digit:int):
-        digit = str(digit)
-        if len(digit) == 2: return int(str(digit[-1]) + str(digit[0]))
-    output_list = [reverse_double_digit(num) for num in input_list]
-    return output_list
-
+    return [int(str(n)[::-1]) for n in input_list]
 
 def question2(input_text:str):
     """
     - Input: "Hello welcome to Cathay 60th year anniversary"
     - Output: digit and al counts
     """
-    exclude = []
     text_dict = {}
-    input_text = input_text.upper()
-    input_text = ''.join(text for text in input_text if text != ' ')
+    input_text = ''.join(text.upper() for text in input_text if text != ' ')
 
     for text in input_text:
-        if text not in exclude:
-            text_dict[text] = input_text.count(text)
-            exclude.append(text)
+        text_dict[text] = text_dict.get(text, 0) + 1
+
     sorted_list = sorted(text_dict.items())
-    answer = '\n'.join(ans[0]+' '+str(ans[1]) for ans in sorted_list)
+    answer = '\n'.join(k +' '+ str(v) for k, v in sorted_list)
     return answer
 
 

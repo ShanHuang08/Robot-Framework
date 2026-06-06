@@ -238,6 +238,9 @@ if __name__ == "__main__":
     # 使用 with 語法自動管理資源
     with Playwright_Funs(headless=False) as pw:
         # 創建桌面頁面
+        driver = pw.launch_browser(browser_type='chromium')
+        driver.new_page()
+        
         page = pw.create_page("https://example.com")
         
         # 創建行動裝置頁面
@@ -253,3 +256,5 @@ if __name__ == "__main__":
         pw.take_screenshot("example.png")
         
         pw.wait(2)
+
+        pw.close()
